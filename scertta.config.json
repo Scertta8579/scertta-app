@@ -1,0 +1,110 @@
+{
+  "name": "Scertta Ecosystem",
+  "version": "2.0.0",
+  "description": "Plataforma de movilidad premium - Ecosistema de apps independientes",
+  "apps": [
+    {
+      "name": "Scertta Rider",
+      "path": "apps/scertta_rider",
+      "type": "flutter",
+      "platform": ["android", "ios"],
+      "target_users": "Pasajeros (solicitantes)",
+      "role_required": "solicitante",
+      "main_file": "lib/main.dart"
+    },
+    {
+      "name": "Scertta Driver",
+      "path": "apps/scertta_driver",
+      "type": "flutter",
+      "platform": ["android", "ios"],
+      "target_users": "Conductores (socios-conductores)",
+      "role_required": "conductor",
+      "main_file": "lib/main.dart"
+    },
+    {
+      "name": "Scertta Admin Web",
+      "path": "apps/scertta_admin_web",
+      "type": "nextjs",
+      "platform": ["web"],
+      "target_users": "CEO, Operadores, Admin, Marketing",
+      "roles_supported": ["ceo", "operador", "admin", "marketing"],
+      "main_file": "app/page.tsx"
+    }
+  ],
+  "shared_services": {
+    "backend": {
+      "name": "Supabase",
+      "url": "https://cmuhwyxmluhnlzcasceq.supabase.co",
+      "services": ["auth", "database", "storage", "edge-functions"]
+    },
+    "maps": {
+      "name": "Mapbox",
+      "token_configured": true,
+      "style": "streets-v12",
+      "center": {
+        "lat": -34.6037,
+        "lng": -58.3816,
+        "city": "Buenos Aires"
+      }
+    },
+    "email": {
+      "name": "Resend",
+      "from": "Scertta <onboarding@resend.dev>",
+      "configured": true
+    }
+  },
+  "roles": [
+    {
+      "id": "solicitante",
+      "name": "Pasajero",
+      "app": "scertta_rider",
+      "permissions": ["request_trip", "view_history", "rate_driver"]
+    },
+    {
+      "id": "conductor",
+      "name": "Conductor",
+      "app": "scertta_driver",
+      "permissions": ["accept_trip", "view_earnings", "select_plan"]
+    },
+    {
+      "id": "ceo",
+      "name": "CEO",
+      "app": "scertta_admin_web",
+      "permissions": ["all"]
+    },
+    {
+      "id": "operador",
+      "name": "Operador",
+      "app": "scertta_admin_web",
+      "permissions": ["validate_documents", "manage_users", "view_history"]
+    },
+    {
+      "id": "admin",
+      "name": "Administrador",
+      "app": "scertta_admin_web",
+      "permissions": ["validate_documents", "manage_users", "view_history"]
+    },
+    {
+      "id": "marketing",
+      "name": "Marketing",
+      "app": "scertta_admin_web",
+      "permissions": ["view_metrics", "send_campaigns", "segment_users"]
+    }
+  ],
+  "migrations": [
+    "001_initial_schema.sql",
+    "002_documentos_y_validacion.sql",
+    "003_planes_y_costos.sql",
+    "004_rol_marketing.sql"
+  ],
+  "documentation": [
+    "README.md",
+    "ARQUITECTURA.md",
+    "INICIO_RAPIDO.md",
+    "MIGRACION_COMPLETADA.md",
+    "RESUMEN_REORGANIZACION.md",
+    "VERIFICACION_FINAL.md"
+  ],
+  "status": "production_ready",
+  "last_updated": "2026-03-08"
+}

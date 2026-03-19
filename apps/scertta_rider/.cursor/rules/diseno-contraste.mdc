@@ -1,0 +1,39 @@
+---
+description: Reglas de diseño UI/UX obligatorias - Contraste y legibilidad
+globs: ["**/*.dart"]
+---
+
+# REGLAS DE DISEÑO OBLIGATORIAS (LEY INQUEBRANTABLE)
+
+## 1. Contraste de Fondo y Texto (REGLA DE ORO)
+
+- **PROHIBIDO**: Fondos claros con textos claros, o fondos oscuros con textos oscuros.
+- El contraste debe ser **máximo** y legible al instante.
+- **Fondo por defecto**: Blanco (`Colors.white` o `0xFFFFFFFF`).
+- **Sobre fondo blanco**: Todo texto, icono, divisor o elemento visual DEBE ser oscuro (`Colors.black`, `Colors.black87`, o gris muy oscuro).
+- **Sobre fondo oscuro**: Los textos DEBEN ser blancos o claros.
+
+## 2. Paleta de Colores Institucionales
+
+| Elemento | Color |
+|----------|-------|
+| Fondo | Blanco (`Colors.white`) |
+| Texto principal | Negro (`Colors.black87` o `Colors.black`) |
+| Texto secundario / Hints | Gris oscuro (`Colors.grey[700]` o `Colors.grey[800]`) |
+| Color de acento | Teal (`Color(0xFF00838F)`) para botones principales, iconos seleccionados, títulos de sección |
+| Iconos secundarios | `Colors.black54` o `Colors.grey[700]` |
+| Iconos activos | Teal (`0xFF00838F`) |
+| Divisores | `Colors.grey[600]` o más oscuro |
+
+## 3. Colores PROHIBIDOS sobre fondo blanco
+
+- `Colors.grey` (sin índice) para texto o iconos
+- `Colors.grey[400]`, `Colors.grey[500]`, `Colors.grey[600]` para texto principal o secundario (usar `grey[700]` o `grey[800]`)
+- Cualquier gris claro que reduzca el contraste
+
+## 4. Aplicación
+
+Al escribir o modificar código visual en este proyecto, verifica que:
+1. Todo texto sobre fondo blanco use `Colors.black87`, `Colors.black`, `Colors.grey[700]` o `Colors.grey[800]`.
+2. Todo icono sobre fondo blanco use `Colors.black54`, `Colors.grey[700]` o Teal si está activo.
+3. Los divisores sobre fondo blanco usen `Colors.grey[600]` o más oscuro.

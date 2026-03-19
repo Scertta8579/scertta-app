@@ -1,0 +1,39 @@
+name: scertta_mobile
+description: Scertta - Plataforma de Movilidad Premium
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Supabase
+  supabase_flutter: ^2.5.0
+  
+  # HTTP para llamar a Edge Functions
+  http: ^1.2.0
+  
+  # Mapas (Mapbox vía flutter_map)
+  flutter_map: ^6.1.0
+  latlong2: ^0.9.0
+  
+  # Geolocalización
+  geolocator: ^11.0.0
+  
+  # UI
+  flutter_svg: ^2.0.9
+  google_fonts: ^6.1.0
+  
+  # URLs (WhatsApp, email, etc.)
+  url_launcher: ^6.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
