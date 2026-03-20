@@ -298,13 +298,13 @@ npm run dev
 
 ### Mapbox ✅
 
-- **Token**: `pk.eyJ1Ijoic2NlcnR0YSIsImEiOiJjbW1ndnltdGUwbXp5Mm9vZmVjaGFraDgwIn0.Gfr0JzTcvW9Pz51I_H6q3Q`
+- **Token**: `MI_TOKEN_AQUI`
 - **Uso**: Mapas interactivos, geocodificación
 - **Configurado en**: Todas las apps
 
 ### Resend ✅
 
-- **API Key**: `re_W2phdeDF_KQwrnGJRZEipcfvPMv87qRYq`
+- **API Key**: `MI_API_KEY_AQUI`
 - **From**: `Scertta <onboarding@resend.dev>`
 - **Uso**: Emails de bienvenida, campañas
 - **Configurado en**: Admin Web + Edge Function

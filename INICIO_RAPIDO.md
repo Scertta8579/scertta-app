@@ -31,8 +31,8 @@ Crear `apps/scertta_admin_web/.env.local`:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://cmuhwyxmluhnlzcasceq.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key_aqui
-NEXT_PUBLIC_MAPBOX_TOKEN=pk.eyJ1Ijoic2NlcnR0YSIsImEiOiJjbW1ndnltdGUwbXp5Mm9vZmVjaGFraDgwIn0.Gfr0JzTcvW9Pz51I_H6q3Q
-RESEND_API_KEY=re_W2phdeDF_KQwrnGJRZEipcfvPMv87qRYq
+NEXT_PUBLIC_MAPBOX_TOKEN=TU_TOKEN_AQUI
+RESEND_API_KEY=TU_API_KEY_AQUI
 ```
 
 **Obtener Anon Key**:

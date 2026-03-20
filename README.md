@@ -144,7 +144,7 @@ Editar `lib/core/constants.dart`:
 
 ```dart
 class AppConstants {
-  static const String mapboxToken = 'pk.eyJ1Ijoic2NlcnR0YSIsImEiOiJjbW1ndnltdGUwbXp5Mm9vZmVjaGFraDgwIn0.Gfr0JzTcvW9Pz51I_H6q3Q';
+  static const String mapboxToken = 'TU_TOKEN_AQUI';
 }
 ```
 
@@ -155,9 +155,7 @@ Crear `apps/scertta_admin_web/.env.local`:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://cmuhwyxmluhnlzcasceq.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key_aqui
-NEXT_PUBLIC_MAPBOX_TOKEN=pk.eyJ1Ijoic2NlcnR0YSIsImEiOiJjbW1ndnltdGUwbXp5Mm9vZmVjaGFraDgwIn0.Gfr0JzTcvW9Pz51I_H6q3Q
-RESEND_API_KEY=re_W2phdeDF_KQwrnGJRZEipcfvPMv87qRYq
-```
+NEXT_PUBLIC_MAPBOX_TOKEN=TU_TOKEN_AQUI```
 
 ---
 
@@ -357,13 +355,13 @@ dependencies:
 
 ### Mapbox
 
-- **Token**: `pk.eyJ1Ijoic2NlcnR0YSIsImEiOiJjbW1ndnltdGUwbXp5Mm9vZmVjaGFraDgwIn0.Gfr0JzTcvW9Pz51I_H6q3Q`
+- **Token**: `TU_TOKEN_AQUI`
 - **Uso**: Mapas interactivos, geocodificación
 - **Docs**: https://docs.mapbox.com
 
 ### Resend
 
-- **API Key**: `re_W2phdeDF_KQwrnGJRZEipcfvPMv87qRYq`
+- **API Key**: ``TU_TOKEN_AQUI
 - **From**: `Scertta <onboarding@resend.dev>`
 - **Uso**: Envío de emails transaccionales
 - **Docs**: https://resend.com/docs

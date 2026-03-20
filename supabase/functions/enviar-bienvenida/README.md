@@ -48,7 +48,7 @@ Para mayor seguridad, puedes mover la API Key a variables de entorno:
 
 ```bash
 # Crear secret
-supabase secrets set RESEND_API_KEY=re_W2phdeDF_KQwrnGJRZEipcfvPMv87qRYq
+supabase secrets set RESEND_API_KEY=TU_TOKEN_AQUI
 
 # Actualizar el código para usar:
 # const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");

@@ -54,7 +54,7 @@ Editar `lib/core/constants.dart`:
 
 ```dart
 class AppConstants {
-  static const String mapboxToken = 'pk.eyJ1Ijoic2NlcnR0YSIsImEiOiJjbW1ndnltdGUwbXp5Mm9vZmVjaGFraDgwIn0.Gfr0JzTcvW9Pz51I_H6q3Q';
+  static const String mapboxToken = 'TU_toKEN_AQu}I';
 }
 ```
 
