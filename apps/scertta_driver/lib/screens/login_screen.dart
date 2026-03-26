@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'ceo_home.dart';
-import 'rider_home.dart';
+// Solo la app de conductor: no importar ceo_home, rider_home, admin_home, marketing_home.
 import 'driver_home.dart';
-import 'admin_home.dart';
-import 'marketing_home.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -259,37 +256,18 @@ class _LoginScreenState extends State<LoginScreen> {
         String nombreDestino;
         
         switch (rolUsuario) {
-          case 'solicitante':
-            destinoScreen = const RiderHomeScreen();
-            nombreDestino = 'Rider Home (Solicitante)';
-            print('📍 Destino: RiderHomeScreen (rol: solicitante)');
-            break;
           case 'conductor':
             destinoScreen = const DriverHomeScreen();
             nombreDestino = 'Driver Home (Conductor)';
             print('📍 Destino: DriverHomeScreen (rol: conductor)');
             break;
-          case 'ceo':
-            destinoScreen = const CeoHomeScreen();
-            nombreDestino = 'CEO Home (CEO)';
-            print('📍 Destino: CeoHomeScreen (rol: ceo)');
-            break;
-          case 'operador':
-          case 'admin':
-            destinoScreen = const AdminHomeScreen();
-            nombreDestino = 'Admin Home (Operador/Admin)';
-            print('📍 Destino: AdminHomeScreen (rol: $rolUsuario)');
-            break;
-          case 'marketing':
-            destinoScreen = const MarketingHomeScreen();
-            nombreDestino = 'Marketing Home (Marketing)';
-            print('📍 Destino: MarketingHomeScreen (rol: marketing)');
-            break;
           default:
-            // Si no hay rol o es desconocido, ir a Rider por defecto
-            destinoScreen = const RiderHomeScreen();
-            nombreDestino = 'Rider Home (Default)';
-            print('⚠️ Rol desconocido o null, usando Rider Home por defecto');
+            // Esta build es solo para conductores; otros roles ven pantalla de error.
+            destinoScreen = const _RolNoPermitidoDriverScreen();
+            nombreDestino = 'Error: rol no permitido en app conductor';
+            print(
+              '⚠️ Rol no conductor (${rolUsuario ?? "null"}): pantalla de error',
+            );
             break;
         }
         
@@ -574,6 +552,76 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Pantalla mínima cuando el usuario no es conductor (esta app no incluye otras homes).
+class _RolNoPermitidoDriverScreen extends StatelessWidget {
+  const _RolNoPermitidoDriverScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        title: const Text('Acceso no disponible'),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Icon(Icons.error_outline, color: Colors.orange, size: 64),
+              const SizedBox(height: 24),
+              const Text(
+                'Esta aplicación es solo para conductores.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Tu cuenta tiene otro rol. Usa la app correspondiente o contacta soporte.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey[400], fontSize: 14),
+              ),
+              const SizedBox(height: 32),
+              ElevatedButton(
+                onPressed: () async {
+                  await Supabase.instance.client.auth.signOut();
+                  if (!context.mounted) return;
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const LoginScreen(),
+                    ),
+                    (_) => false,
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0b4bb3),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: const Text(
+                  'Cerrar sesión y volver',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

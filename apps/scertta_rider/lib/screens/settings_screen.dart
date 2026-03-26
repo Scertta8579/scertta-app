@@ -196,6 +196,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildSettingsTile(icon: Icons.phone_android_outlined, title: 'Teléfono', subtitle: _profilePhone?.trim().isNotEmpty == true ? _profilePhone! : 'Sin configurar', onTap: () {}),
           _buildSettingsTile(icon: Icons.lock_outline, title: 'Cambiar contraseña', subtitle: '******', onTap: () {}),
           _buildSettingsTile(icon: Icons.share_outlined, title: 'Mis redes sociales', subtitle: 'Asociar cuentas', onTap: () {}),
+          ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+            leading: const Icon(Icons.delete_forever, color: Colors.red),
+            title: const Text('Eliminar Cuenta', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+            trailing: const Icon(Icons.chevron_right, color: Colors.red, size: 20),
+            onTap: () {},
+          ),
           const Divider(),
           _buildSectionTitle('Preferencias de viaje'),
           _buildSettingsTile(icon: Icons.star_border, title: 'FAVORITOS', subtitle: 'Casa, Trabajo, Gimnasio', onTap: _showFavoritesModal),

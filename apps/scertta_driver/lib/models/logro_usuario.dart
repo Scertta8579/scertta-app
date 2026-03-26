@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class LogroUsuario {
   final String userId;
   final String nombre;
@@ -51,15 +53,15 @@ class LogroUsuario {
     final ahora = DateTime.now();
     final diferencia = ahora.difference(fechaIngreso);
 
-    final años = diferencia.inDays ~/ 365;
+    final anos = diferencia.inDays ~/ 365;
     final meses = (diferencia.inDays % 365) ~/ 30;
     final dias = (diferencia.inDays % 365) % 30;
 
-    if (años > 0) {
+    if (anos > 0) {
       if (meses > 0) {
-        return '$años ${años == 1 ? "año" : "años"} y $meses ${meses == 1 ? "mes" : "meses"}';
+        return '$anos ${anos == 1 ? "año" : "años"} y $meses ${meses == 1 ? "mes" : "meses"}';
       }
-      return '$años ${años == 1 ? "año" : "años"}';
+      return '$anos ${anos == 1 ? "año" : "años"}';
     } else if (meses > 0) {
       return '$meses ${meses == 1 ? "mes" : "meses"}';
     } else if (dias > 0) {
