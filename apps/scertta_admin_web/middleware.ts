@@ -89,6 +89,7 @@ export async function middleware(request: NextRequest) {
     '/ceo-dashboard': ['ceo'],
     '/back-office': ['ceo', 'operador', 'admin'],
     '/marketing': ['ceo', 'marketing'],
+    '/libro-numeros': ['ceo', 'contable'],
     '/solicitante': ['solicitante', 'ceo'],
     '/socio-conductor': ['conductor', 'ceo'],
   }
