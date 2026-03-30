@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'config/supabase_config.dart';
+import 'core/auth_wrapper.dart';
 import 'screens/login_screen.dart';
-import 'screens/driver_home.dart';
 import 'screens/plan_selection_screen.dart';
 
 Future<void> main() async {
@@ -56,10 +56,9 @@ class ScerttaDriverApp extends StatelessWidget {
           ),
         ),
       ),
-      initialRoute: '/login',
+      home: const AuthWrapper(),
       routes: {
         '/login': (context) => const LoginScreen(),
-        '/driver': (context) => const DriverHomeScreen(),
         '/plan-selection': (context) => const PlanSelectionScreen(),
       },
     );
