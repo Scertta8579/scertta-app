@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -24,6 +25,16 @@ import 'support_screen.dart';
 const Color kScerttaCyan = Color(0xFF00838F);
 
 enum TipoServicio { envios, personas, reserva }
+
+enum PassengerTripState {
+  online,
+  searching,
+  match_accepted,
+  driver_arrived,
+  in_trip,
+  trip_ended,
+  rating,
+}
 
 class RiderHomeScreen extends StatefulWidget {
   const RiderHomeScreen({super.key});
@@ -55,12 +66,15 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
   TimeOfDay? _reservaHora;
   String _reservaMotivo = '';
 
-  // VARIABLES DE SEGURIDAD
-  bool _usuarioVerificado = false; // DNI
-  bool _tieneFotoPerfil = false;   // Selfie
+  // VARIABLES DE SEGURIDAD (toggles también en Dev Panel)
+  bool _dniAprobado = false;
+  bool _selfieAprobada = false;
   bool _pinVerificado = false;     // PIN
   bool _redesVerificadas = false;  // Redes
-  
+
+  /// Mock: deuda Scertta Cash por pago parcial previo (se suma al próximo viaje).
+  double _deudaPendiente = 840.0;
+
   int _viajesTotales = 105;
   String _categoriaActual = 'Scertta Gold';
   
@@ -79,6 +93,20 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
   ScerttaPriceBreakdown? _priceBreakdown;
   double _peajes = 0;
   int _selectedPaymentIndex = 0;
+
+  /// Preferencia de ruta: `true` = vía rápida con peajes, `false` = sin peajes.
+  bool _aceptaPeajes = true;
+
+  /// Precios opcionales para "Confirma tu viaje" (p. ej. match directo con descuento).
+  double? _precioConfirmacionOriginal;
+  double? _precioConfirmacionConDescuento;
+
+  PassengerTripState _currentState = PassengerTripState.online;
+  Timer? _waitTimer;
+  Timer? _matchSimulationTimer;
+  int _segundosEsperando = 0;
+  int _ratingEstrellas = 0;
+  final TextEditingController _ratingComentarioController = TextEditingController();
 
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
@@ -149,8 +177,49 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
     }
   }
 
+  void _cancelarCronometroEspera() {
+    _waitTimer?.cancel();
+    _waitTimer = null;
+  }
+
+  void _iniciarCronometroEspera() {
+    _cancelarCronometroEspera();
+    _waitTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      setState(() {
+        _segundosEsperando++;
+      });
+    });
+  }
+
+  void _cancelarSimulacionMatch() {
+    _matchSimulationTimer?.cancel();
+    _matchSimulationTimer = null;
+  }
+
+  void _resetToOnlineSearch() {
+    _cancelarCronometroEspera();
+    _cancelarSimulacionMatch();
+    setState(() {
+      _currentState = PassengerTripState.online;
+      _segundosEsperando = 0;
+      _isSearching = false;
+      _showServices = false;
+      _showPaymentStep = false;
+      _routePoints = [];
+      _priceBreakdown = null;
+      _precioConfirmacionOriginal = null;
+      _precioConfirmacionConDescuento = null;
+      _ratingEstrellas = 0;
+      _ratingComentarioController.clear();
+    });
+  }
+
   @override
   void dispose() {
+    _cancelarCronometroEspera();
+    _cancelarSimulacionMatch();
+    _ratingComentarioController.dispose();
     _pulseController.dispose();
     _origenController.dispose();
     _destinoController.dispose();
@@ -307,7 +376,7 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
       onTap: () {
         if (bloqueado) return;
         
-        if (!_usuarioVerificado) {
+        if (!_dniAprobado) {
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
@@ -330,9 +399,34 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
           return;
         }
 
+        if (!_selfieAprobada) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: const Text('Verificación facial'),
+              content: const Text('Necesitamos una selfie o foto de perfil para tu seguridad y la de los conductores antes de pedir un viaje.'),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const SecurityVerificationScreen()));
+                  },
+                  style: ElevatedButton.styleFrom(backgroundColor: kScerttaCyan, foregroundColor: Colors.white),
+                  child: const Text('Completar verificación'),
+                ),
+              ],
+            ),
+          );
+          return;
+        }
+
         setState(() {
           _vehiculoSeleccionado = index;
           _showPaymentStep = true;
+          _precioConfirmacionOriginal = null;
+          _precioConfirmacionConDescuento = null;
         });
       },
       child: Opacity(
@@ -656,28 +750,170 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
     }
   }
 
-  Widget _buildDebugCheckbox(String titulo, bool valorActual, ValueChanged<bool?> onChanged) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: 24,
-            height: 24,
-            child: Checkbox(
-              value: valorActual,
-              onChanged: onChanged,
-              activeColor: kScerttaCyan,
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+  void _mostrarDevPanelBottomSheet() {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.white,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+            child: StatefulBuilder(
+              builder: (context, setModalState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Text(
+                      'Dev Panel',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                    ),
+                    const SizedBox(height: 8),
+                    SwitchListTile(
+                      title: const Text('Simular DNI Aprobado'),
+                      value: _dniAprobado,
+                      activeThumbColor: kScerttaCyan,
+                      onChanged: (v) {
+                        setState(() => _dniAprobado = v);
+                        setModalState(() {});
+                      },
+                    ),
+                    SwitchListTile(
+                      title: const Text('Simular Selfie Aprobada'),
+                      value: _selfieAprobada,
+                      activeThumbColor: kScerttaCyan,
+                      onChanged: (v) {
+                        setState(() => _selfieAprobada = v);
+                        setModalState(() {});
+                      },
+                    ),
+                    const Divider(height: 24),
+                    OutlinedButton(
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        _resetToOnlineSearch();
+                      },
+                      child: const Text('Reiniciar App (Modo Búsqueda)'),
+                    ),
+                    const SizedBox(height: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        _cancelarSimulacionMatch();
+                        setState(() {
+                          _currentState = PassengerTripState.searching;
+                          _showServices = false;
+                          _showPaymentStep = false;
+                          _isSearching = false;
+                        });
+                        _matchSimulationTimer = Timer(const Duration(seconds: 3), () {
+                          if (!mounted) return;
+                          setState(() => _currentState = PassengerTripState.match_accepted);
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepPurple,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: const Text('Simular Chofer Acepta Viaje'),
+                    ),
+                    const SizedBox(height: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        setState(() {
+                          _currentState = PassengerTripState.driver_arrived;
+                          _segundosEsperando = 0;
+                          _showServices = false;
+                          _showPaymentStep = false;
+                          _isSearching = false;
+                        });
+                        _iniciarCronometroEspera();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: const Text('Simular Chofer Llega al Lugar'),
+                    ),
+                    const SizedBox(height: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        setState(() {
+                          _currentState = PassengerTripState.in_trip;
+                          _showServices = false;
+                          _showPaymentStep = false;
+                          _isSearching = false;
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: const Text('Simular Iniciar Viaje'),
+                    ),
+                    const SizedBox(height: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        setState(() {
+                          _currentState = PassengerTripState.trip_ended;
+                          _showServices = false;
+                          _showPaymentStep = false;
+                          _isSearching = false;
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.brown,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: const Text('Simular Terminar Viaje'),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
-          const SizedBox(width: 4),
-          SizedBox(
-            width: 45,
-            child: Text(titulo, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500)),
-          ),
-        ],
+        );
+      },
+    );
+  }
+
+  void _onAgregarConductor() {
+    if (_destinoController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Por favor, escribí a dónde vas primero.'),
+          backgroundColor: Colors.red.shade700,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => _DialogVincularConductor(
+        onCodigoConfirmado: () {
+          if (!mounted) return;
+          FocusScope.of(context).unfocus();
+          setState(() {
+            _isSearching = false;
+            _showServices = true;
+            _showPaymentStep = true;
+            _vehiculoSeleccionado = 0;
+            _precioConfirmacionOriginal = 1090.0;
+            _precioConfirmacionConDescuento = 959.0;
+          });
+        },
       ),
     );
   }
@@ -770,7 +1006,7 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
             ListTile(
               leading: const Icon(Icons.verified_user, color: Colors.orange),
               title: const Text('Verificación de Seguridad', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w500)),
-              trailing: (!_usuarioVerificado || !_tieneFotoPerfil)
+              trailing: (!_dniAprobado || !_selfieAprobada)
                   ? Container(width: 10, height: 10, decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle))
                   : null,
               onTap: () {
@@ -1111,19 +1347,29 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
                       ],
                     ),
                     const SizedBox(height: 16),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: ElevatedButton.icon(
-                        onPressed: () => _continuarAServicios(context),
-                        icon: const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
-                        label: const Text('Siguiente', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: kScerttaCyan,
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                          elevation: 2,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        OutlinedButton(
+                          onPressed: _onAgregarConductor,
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                            side: const BorderSide(color: kScerttaCyan, width: 1.2),
+                            foregroundColor: kScerttaCyan,
+                          ),
+                          child: const Text('Agregar conductor', style: TextStyle(fontWeight: FontWeight.w600)),
                         ),
-                      ),
+                        ElevatedButton(
+                          onPressed: () => _continuarAServicios(context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: kScerttaCyan,
+                            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                            elevation: 2,
+                          ),
+                          child: const Text('Siguiente', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -1185,38 +1431,39 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
                         ),
                       ),
                     ),
+                ),
+              ),
+            ),
+          ),
+
+          if (_deudaPendiente > 0 && !_isSearching && _currentState == PassengerTripState.online)
+            Positioned(
+              top: 60,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.72),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.white.withOpacity(0.35)),
+                    boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 6, offset: Offset(0, 2))],
+                  ),
+                  child: Text(
+                    'Deuda Scertta: \$${_deudaPendiente.toStringAsFixed(0)}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.2,
+                    ),
                   ),
                 ),
               ),
             ),
 
-          Positioned(
-            right: 16,
-            top: MediaQuery.of(context).size.height * 0.35,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.95),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.redAccent.withOpacity(0.5)),
-                boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 8)],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Debug\nSeguridad', textAlign: TextAlign.center, style: TextStyle(fontSize: 10, color: Colors.red, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  _buildDebugCheckbox('DNI', _usuarioVerificado, (v) => setState(() => _usuarioVerificado = v!)),
-                  _buildDebugCheckbox('Selfie', _tieneFotoPerfil, (v) => setState(() => _tieneFotoPerfil = v!)),
-                  _buildDebugCheckbox('PIN', _pinVerificado, (v) => setState(() => _pinVerificado = v!)),
-                  _buildDebugCheckbox('Redes', _redesVerificadas, (v) => setState(() => _redesVerificadas = v!)),
-                ],
-              ),
-            ),
-          ),
-
-          if (!_isSearching && !_showServices)
+          if (!_isSearching && !_showServices && _currentState == PassengerTripState.online)
             Positioned(
               bottom: 0,
               left: 0,
@@ -1238,27 +1485,33 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
                         ),
                         child: Material(
                           color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () {
-                              setState(() {
-                                _isSearching = true;
-                              });
-                            },
-                            borderRadius: BorderRadius.circular(16),
-                            child: Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(vertical: 18),
-                              decoration: BoxDecoration(
-                                color: kScerttaCyan,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _isSearching = true;
+                                  });
+                                },
                                 borderRadius: BorderRadius.circular(16),
-                                boxShadow: [BoxShadow(color: kScerttaCyan.withOpacity(0.25), blurRadius: 12, offset: const Offset(0, 4))],
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.symmetric(vertical: 18),
+                                  decoration: BoxDecoration(
+                                    color: kScerttaCyan,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: [BoxShadow(color: kScerttaCyan.withOpacity(0.25), blurRadius: 12, offset: const Offset(0, 4))],
+                                  ),
+                                  child: const Text(
+                                    '¿A dónde vamos?',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18, letterSpacing: 1.2),
+                                  ),
+                                ),
                               ),
-                              child: const Text(
-                                '¿A DÓNDE VAS?',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18, letterSpacing: 1.2),
-                              ),
-                            ),
+                            ],
                           ),
                         ),
                       ),
@@ -1268,7 +1521,7 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
               ),
             ),
 
-          if (_showServices)
+          if (_showServices && _currentState == PassengerTripState.online)
             Positioned(
               bottom: 0,
               left: 0,
@@ -1285,14 +1538,33 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
                   child: SingleChildScrollView(
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-                      child: _showPaymentStep ? _buildPaymentStepView() : _buildServicesStepView(),
+                      child: _showPaymentStep
+                          ? _buildPaymentStepView(
+                              precioOriginal: _precioConfirmacionOriginal,
+                              precioConDescuento: _precioConfirmacionConDescuento,
+                            )
+                          : _buildServicesStepView(),
                     ),
                   ),
                 ),
               ),
             ),
 
-          if (!_isSearching && !_showServices)
+          if (_currentState != PassengerTripState.online)
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                  child: _buildPassengerTripBottomPanel(),
+                ),
+              ),
+            ),
+
+          if (!_isSearching && !_showServices && _currentState == PassengerTripState.online)
             Positioned.fill(
               child: IgnorePointer(
                 child: Center(
@@ -1314,10 +1586,10 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
               ),
             ),
 
-          if (!_showServices)
+          if (!_showServices && _currentState == PassengerTripState.online)
             Positioned(
               right: 16,
-              bottom: MediaQuery.of(context).padding.bottom + 130,
+              bottom: MediaQuery.of(context).padding.bottom + 140,
               child: Material(
                 elevation: 4,
                 borderRadius: BorderRadius.circular(12),
@@ -1339,6 +1611,18 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
                 ),
               ),
             ),
+
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 40,
+            right: 16,
+            child: FloatingActionButton.small(
+              heroTag: 'rider_dev_panel',
+              backgroundColor: Colors.orange,
+              foregroundColor: Colors.white,
+              onPressed: _mostrarDevPanelBottomSheet,
+              child: const Icon(Icons.bug_report),
+            ),
+          ),
 
           if (_isLoadingLocation)
             Positioned(
@@ -1373,6 +1657,291 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
         ],
       ),
     ),
+    );
+  }
+
+  Widget _buildPassengerTripBottomPanel() {
+    switch (_currentState) {
+      case PassengerTripState.online:
+        return const SizedBox.shrink();
+      case PassengerTripState.searching:
+        return _buildSearchingTripPanel();
+      case PassengerTripState.match_accepted:
+        return _buildMatchAcceptedPanel();
+      case PassengerTripState.driver_arrived:
+        return _buildDriverArrivedPanel();
+      case PassengerTripState.in_trip:
+        return _buildInTripPanel();
+      case PassengerTripState.trip_ended:
+        return _buildTripEndedReceiptPanel();
+      case PassengerTripState.rating:
+        return _buildRatingPanel();
+    }
+  }
+
+  Widget _buildSearchingTripPanel() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.12), blurRadius: 16, offset: const Offset(0, -4)),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(
+            width: 40,
+            height: 40,
+            child: CircularProgressIndicator(strokeWidth: 3, color: kScerttaCyan),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'Buscando al chofer ideal...',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.grey[800]),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMatchAcceptedPanel() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.12), blurRadius: 16, offset: const Offset(0, -4)),
+        ],
+      ),
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text(
+            'Chofer encontrado',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+          const ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: CircleAvatar(
+              radius: 32,
+              backgroundImage: NetworkImage(
+                'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+              ),
+            ),
+            title: Text(
+              'Carlos (Toyota Corolla gris, AB ** CD)',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+            ),
+            subtitle: Text('Chofer en camino...', style: TextStyle(fontSize: 14)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInTripPanel() {
+    final destinoTxt = _destinoController.text.trim().isNotEmpty ? _destinoController.text.trim() : 'Portela 857';
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.12), blurRadius: 16, offset: const Offset(0, -4)),
+        ],
+      ),
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.route, color: kScerttaCyan, size: 28),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Viaje en curso a $destinoTxt',
+                  style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.black87),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          OutlinedButton.icon(
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Enlace de compartir viaje (mock)')),
+              );
+            },
+            icon: const Icon(Icons.share, color: kScerttaCyan),
+            label: const Text('Compartir viaje'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: kScerttaCyan,
+              side: const BorderSide(color: kScerttaCyan),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTripEndedReceiptPanel() {
+    final tieneDescuento = _precioConfirmacionConDescuento != null && _precioConfirmacionOriginal != null;
+    final precioFinalTxt = ScerttaPricingService.formatPrice(
+      _precioConfirmacionConDescuento ?? _priceBreakdown?.total ?? 959.0,
+    );
+    final precioTachadoTxt = _precioConfirmacionOriginal != null
+        ? ScerttaPricingService.formatPrice(_precioConfirmacionOriginal!)
+        : ScerttaPricingService.formatPrice(1090.0);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.12), blurRadius: 16, offset: const Offset(0, -4)),
+        ],
+      ),
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text(
+            'Recibo del viaje',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          if (tieneDescuento) ...[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  precioTachadoTxt,
+                  style: const TextStyle(
+                    decoration: TextDecoration.lineThrough,
+                    color: Colors.grey,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Tarifa base',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+          ],
+          Text(
+            'Total a pagar: $precioFinalTxt',
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: kScerttaCyan),
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: ElevatedButton(
+              onPressed: () {
+                setState(() => _currentState = PassengerTripState.rating);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kScerttaCyan,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+              child: const Text('Siguiente', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRatingPanel() {
+    return Container(
+      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.55),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.12), blurRadius: 16, offset: const Offset(0, -4)),
+        ],
+      ),
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              '¿Cómo fue tu viaje?',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(5, (i) {
+                final n = i + 1;
+                final sel = _ratingEstrellas >= n;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: GestureDetector(
+                    onTap: () => setState(() => _ratingEstrellas = n),
+                    child: Icon(
+                      sel ? Icons.star : Icons.star_border,
+                      size: 44,
+                      color: sel ? Colors.amber.shade700 : Colors.grey,
+                    ),
+                  ),
+                );
+              }),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _ratingComentarioController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText: 'Comentario opcional',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                contentPadding: const EdgeInsets.all(12),
+              ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  final estrellas = _ratingEstrellas;
+                  _resetToOnlineSearch();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Calificación: $estrellas estrellas')),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: kScerttaCyan,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text('Enviar Calificación', style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -1430,12 +1999,157 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
     }
   }
 
-  Widget _buildPaymentStepView() {
+  Widget _buildRutaPeajesSelector() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Preferencia de Ruta',
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey[800]),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Ruta y Peajes',
+            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => setState(() => _aceptaPeajes = true),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: _aceptaPeajes ? kScerttaCyan.withOpacity(0.12) : Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: _aceptaPeajes ? kScerttaCyan : Colors.grey.shade300,
+                        width: _aceptaPeajes ? 2 : 1,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Icon(Icons.speed, color: _aceptaPeajes ? kScerttaCyan : Colors.grey, size: 26),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Más rápida',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                            color: _aceptaPeajes ? Colors.black87 : Colors.grey[700],
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Con peajes',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => setState(() => _aceptaPeajes = false),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: !_aceptaPeajes ? kScerttaCyan.withOpacity(0.12) : Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: !_aceptaPeajes ? kScerttaCyan : Colors.grey.shade300,
+                        width: !_aceptaPeajes ? 2 : 1,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Icon(Icons.alt_route, color: !_aceptaPeajes ? kScerttaCyan : Colors.grey, size: 26),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Sin peajes',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                            color: !_aceptaPeajes ? Colors.black87 : Colors.grey[700],
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Puede demorar más',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPaymentStepView({double? precioOriginal, double? precioConDescuento}) {
     final metodos = _getEnabledPaymentMethods();
     if (_selectedPaymentIndex >= metodos.length) _selectedPaymentIndex = 0;
     final metodoSeleccionado = metodos.isNotEmpty ? metodos[_selectedPaymentIndex] : null;
 
     final precioFinal = _priceBreakdown != null ? _priceBreakdown!.total : 0.0;
+
+    final Widget precioWidget;
+    if (precioConDescuento != null) {
+      final origenTachado = precioOriginal ?? precioFinal;
+      precioWidget = Center(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              ScerttaPricingService.formatPrice(origenTachado),
+              style: const TextStyle(
+                decoration: TextDecoration.lineThrough,
+                color: Colors.grey,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              ScerttaPricingService.formatPrice(precioConDescuento),
+              style: const TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: kScerttaCyan,
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      precioWidget = Center(
+        child: Text(
+          _priceBreakdown != null ? ScerttaPricingService.formatPrice(precioFinal) : 'A cotizar',
+          style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.black87),
+        ),
+      );
+    }
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -1450,6 +2164,8 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
               onPressed: () {
                 setState(() {
                   _showPaymentStep = false;
+                  _precioConfirmacionOriginal = null;
+                  _precioConfirmacionConDescuento = null;
                 });
               },
             ),
@@ -1465,12 +2181,7 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
           ],
         ),
         const SizedBox(height: 16),
-        Center(
-          child: Text(
-            _priceBreakdown != null ? ScerttaPricingService.formatPrice(precioFinal) : 'A cotizar',
-            style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.black87),
-          ),
-        ),
+        precioWidget,
         const SizedBox(height: 8),
         Center(
           child: Text(
@@ -1522,20 +2233,52 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
             }).toList(),
           ),
         const SizedBox(height: 16),
+        _buildRutaPeajesSelector(),
+        const SizedBox(height: 16),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
+              Navigator.maybePop(context);
               final metodo = metodos.isNotEmpty ? metodos[_selectedPaymentIndex].label : 'Pago';
+              final precioEfectivo = precioConDescuento ?? precioFinal;
+              final precioStr = precioEfectivo > 0 ? ScerttaPricingService.formatPrice(precioEfectivo) : '';
+              final esMatchDirecto = precioConDescuento != null;
+
               if (_tipoServicioSeleccionado == TipoServicio.reserva && _reservaFecha != null && _reservaHora != null) {
                 final dt = DateTime(_reservaFecha!.year, _reservaFecha!.month, _reservaFecha!.day, _reservaHora!.hour, _reservaHora!.minute);
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('Reserva confirmada para ${dt.day}/${dt.month}/${dt.year} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}. Pagás con $metodo'),
+                  content: Text('Reserva confirmada para ${dt.day}/${dt.month}/${dt.year} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}. Pagás con $metodo${precioStr.isNotEmpty ? ' ($precioStr)' : ''}'),
                 ));
-                // TODO: Guardar en backend con timestamp dt en lugar de "ahora"
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Viaje confirmado. Pagás con $metodo')));
+                setState(() {
+                  _showServices = false;
+                  _showPaymentStep = false;
+                });
+                return;
               }
+
+              if (esMatchDirecto) {
+                setState(() {
+                  _showServices = false;
+                  _showPaymentStep = false;
+                  _currentState = PassengerTripState.match_accepted;
+                });
+                return;
+              }
+
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(precioStr.isNotEmpty ? 'Viaje confirmado. Pagás con $metodo ($precioStr)' : 'Viaje confirmado. Pagás con $metodo'),
+              ));
+              setState(() {
+                _showServices = false;
+                _showPaymentStep = false;
+                _currentState = PassengerTripState.searching;
+              });
+              _cancelarSimulacionMatch();
+              _matchSimulationTimer = Timer(const Duration(seconds: 3), () {
+                if (!mounted) return;
+                setState(() => _currentState = PassengerTripState.match_accepted);
+              });
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: kScerttaCyan,
@@ -1546,6 +2289,286 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
             ),
             child: const Text('PEDIR VIAJE', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDriverArrivedPanel() {
+    final m = _segundosEsperando ~/ 60;
+    final s = _segundosEsperando % 60;
+    final timeStr = '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+    final enCortesia = _segundosEsperando <= 180;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.12), blurRadius: 16, offset: const Offset(0, -4)),
+        ],
+      ),
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text(
+            'Tu conductor ha llegado',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+          const ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: CircleAvatar(
+              radius: 28,
+              backgroundImage: NetworkImage(
+                'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+              ),
+            ),
+            title: Text('Carlos', style: TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text('AB 123 CD'),
+          ),
+          const SizedBox(height: 16),
+          Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              decoration: BoxDecoration(
+                color: enCortesia ? Colors.green.shade50 : Colors.red.shade50,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: enCortesia ? Colors.green.shade200 : Colors.red.shade200,
+                ),
+              ),
+              child: enCortesia
+                  ? Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          timeStr,
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green.shade900,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Tiempo de cortesía',
+                          style: TextStyle(fontSize: 13, color: Colors.green.shade900, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.warning_amber_rounded, color: Colors.red.shade700, size: 28),
+                            const SizedBox(width: 8),
+                            Text(
+                              timeStr,
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red.shade700,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Tiempo de espera (Se aplicarán cargos extra)',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 13, color: Colors.red.shade800, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: () {
+                _cancelarCronometroEspera();
+                setState(() {
+                  _currentState = PassengerTripState.in_trip;
+                  _segundosEsperando = 0;
+                });
+              },
+              style: OutlinedButton.styleFrom(
+                foregroundColor: kScerttaCyan,
+                side: const BorderSide(color: kScerttaCyan),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+              child: const Text('Simular: Subir al auto', style: TextStyle(fontWeight: FontWeight.w600)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Diálogo "Vincular Conductor": 6 casilleros con foco encadenado.
+class _DialogVincularConductor extends StatefulWidget {
+  final VoidCallback onCodigoConfirmado;
+
+  const _DialogVincularConductor({required this.onCodigoConfirmado});
+
+  @override
+  State<_DialogVincularConductor> createState() => _DialogVincularConductorState();
+}
+
+class _DialogVincularConductorState extends State<_DialogVincularConductor> {
+  static const int _n = 6;
+  late final List<TextEditingController> _controllers;
+  late final List<FocusNode> _focusNodes;
+  bool _batchingControllers = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controllers = List.generate(_n, (_) => TextEditingController());
+    _focusNodes = List.generate(_n, (_) => FocusNode());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _focusNodes[0].requestFocus();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    for (final c in _controllers) {
+      c.dispose();
+    }
+    for (final f in _focusNodes) {
+      f.dispose();
+    }
+    super.dispose();
+  }
+
+  void _onCellChanged(int index, String raw) {
+    if (_batchingControllers) {
+      return;
+    }
+    final upper = raw.toUpperCase();
+    final filtered = upper.replaceAll(RegExp(r'[^A-Z0-9]'), '');
+
+    if (filtered.length > 1) {
+      _batchingControllers = true;
+      for (var i = 0; i < _n; i++) {
+        _controllers[i].text = i < filtered.length ? filtered[i] : '';
+      }
+      final last = filtered.length >= _n ? _n - 1 : filtered.length;
+      _focusNodes[last].requestFocus();
+      _controllers[last].selection = TextSelection.collapsed(offset: _controllers[last].text.length);
+      _batchingControllers = false;
+      setState(() {});
+      return;
+    }
+
+    if (filtered.isEmpty) {
+      _controllers[index].text = '';
+      if (index > 0) {
+        _focusNodes[index - 1].requestFocus();
+      }
+      setState(() {});
+      return;
+    }
+
+    final ch = filtered[0];
+    _controllers[index].text = ch;
+    _controllers[index].selection = TextSelection.collapsed(offset: 1);
+    if (index < _n - 1) {
+      _focusNodes[index + 1].requestFocus();
+    }
+    setState(() {});
+  }
+
+  void _confirmarCodigo() {
+    final code = _controllers.map((c) => c.text).join();
+    if (code.length != _n) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Completá el código de 6 caracteres.')),
+      );
+      return;
+    }
+    Navigator.pop(context);
+    widget.onCodigoConfirmado();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: const Text('Vincular Conductor'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Ingresá el código de 6 caracteres del conductor.',
+              style: TextStyle(fontSize: 12, color: Colors.grey[700], height: 1.35),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: List.generate(_n, (i) {
+                return SizedBox(
+                  width: 45,
+                  height: 45,
+                  child: TextField(
+                    controller: _controllers[i],
+                    focusNode: _focusNodes[i],
+                    textAlign: TextAlign.center,
+                    maxLength: 1,
+                    textCapitalization: TextCapitalization.characters,
+                    keyboardType: TextInputType.text,
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    decoration: InputDecoration(
+                      counterText: '',
+                      contentPadding: EdgeInsets.zero,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: kScerttaCyan, width: 2),
+                      ),
+                    ),
+                    onChanged: (v) => _onCellChanged(i, v),
+                  ),
+                );
+              }),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _confirmarCodigo,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: kScerttaCyan,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text('Confirmar Código', style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar'),
         ),
       ],
     );

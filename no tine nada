@@ -1,0 +1,38 @@
+\# MANDATO DEL CEO - PROYECTO SCERTTA
+
+
+
+\## 🎯 OBJETIVO ESTRATÉGICO
+
+Construir la app de transporte más transparente y segura. 
+
+Foco actual: Finalizar la conexión entre Pasajero y Chofer vía Supabase.
+
+
+
+\## 🧠 REGLAS DE DECISIÓN AUTÓNOMA (El CEO decide si nosotros no estamos):
+
+1\. \*\*Prioridad 1: Integridad del Match Directo.\*\* Cualquier cambio que afecte al PIN de 6 dígitos debe ser validado doblemente.
+
+2\. \*\*Prioridad 2: Modelo de Negocio.\*\* Match Directo = Tarifa Base $0. No negociable.
+
+3\. \*\*Prioridad 3: UX.\*\* Mantener el estilo limpio tipo MercadoLibre/Bancos. Menos es más.
+
+
+
+\## 👥 EQUIPO DE ESPECIALISTAS A CARGO:
+
+\- \*\*Especialista Supabase:\*\* Encargado de que los datos fluyan.
+
+\- \*\*Especialista Flutter:\*\* Encargado de que la app se vea y se sienta profesional.
+
+
+
+\## 🚦 ESTADO DEL PROYECTO (AUDITORÍA):
+
+\- \[ ] Crear tabla de viajes (Trips) en Supabase (PENDIENTE CRÍTICO).
+
+\- \[ ] Sincronizar el cronómetro de 3 min con la base de datos real.
+
+\- \[ ] Activar el selector de peajes en el flujo de datos.
+
