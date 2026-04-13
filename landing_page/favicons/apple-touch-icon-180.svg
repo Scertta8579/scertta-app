@@ -1,0 +1,8 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="S-Route App Icon">
+  <!-- Background with rounded corners (iOS clips automatically) -->
+  <rect width="180" height="180" rx="40" fill="#0A1628"/>
+  <!-- Route icon centered and scaled up -->
+  <circle cx="32" cy="90" r="22" fill="#00C896"/>
+  <path d="M54 90 C72 48, 108 48, 114 90 C120 132, 156 132, 170 90" stroke="#00C896" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="170" cy="90" r="14" fill="#00C896" fill-opacity="0.6"/>
+</svg>

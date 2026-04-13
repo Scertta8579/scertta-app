@@ -1,0 +1,25 @@
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Configuración sensible
+lib/config/supabase_config.dart
+lib/core/constants.dart
+.env
+.env.local
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db

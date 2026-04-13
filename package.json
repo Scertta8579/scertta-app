@@ -1,0 +1,14 @@
+{
+  "name": "scertta-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/scertta_admin_web"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w scertta-admin-web",
+    "build": "npm run build -w scertta-admin-web",
+    "start": "npm run start -w scertta-admin-web",
+    "lint": "npm run lint -w scertta-admin-web"
+  }
+}

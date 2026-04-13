@@ -1,0 +1,8 @@
+<svg width="130" height="28" viewBox="0 0 130 28" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="S-Route">
+  <!-- Route icon: origin dot → curved path → destination dot -->
+  <circle cx="7" cy="14" r="4.5" fill="#00C896"/>
+  <path d="M11.5 14 C16 6, 22 6, 24 14 C26 22, 32 22, 36.5 14" stroke="#00C896" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <circle cx="36.5" cy="14" r="3" fill="#00C896" fill-opacity="0.65"/>
+  <!-- Wordmark: S-Route (dark text for light backgrounds) -->
+  <text x="46" y="19.5" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="15" font-weight="800" letter-spacing="-0.4" fill="#0A1628">S-Route</text>
+</svg>

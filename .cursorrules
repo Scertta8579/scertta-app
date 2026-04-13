@@ -1,0 +1,33 @@
+# Scertta — Reglas del proyecto
+
+## Qué estamos construyendo
+Scertta es una **plataforma de movilidad premium**. Todo el código y la comunicación deben alinearse con este producto.
+
+## Stack técnico
+- **Next.js** (App Router)
+- **Tailwind CSS** para estilos
+- **Supabase** (Auth, base de datos, Storage)
+- **TypeScript** con tipado robusto (evitar `any`, tipar respuestas de API y estado)
+
+## Regla de oro
+- **No usar la palabra "Uber"** en código, comentarios, copy de UI ni documentación del proyecto.
+
+## Roles de la plataforma
+Los roles definidos en la tabla `perfiles` y en la lógica de negocio son:
+- `ceo`
+- `operador`
+- `marketing`
+- `solicitante`
+- `conductor`
+
+Usar exactamente estos valores al crear perfiles, en el middleware y en `lib/auth.js`.
+
+## Seguridad
+- **Rutas protegidas**: Verificar siempre que el usuario autenticado tenga el rol correcto antes de permitir acceso a `/ceo-dashboard`, `/back-office`, `/solicitante`, `/socio-conductor`, `/marketing`.
+- El middleware debe redirigir según `perfiles.rol` y no permitir acceso cruzado entre roles.
+- Rutas públicas explícitas (ej. `/solicitante/registro`, `/login`) deben estar definidas y no exigir sesión.
+
+## Código
+- Preferir **TypeScript** con tipos explícitos.
+- Validar datos de formularios y respuestas de Supabase antes de usarlos.
+- Mantener la terminología legal/operativa acordada (solicitante, socio-conductor, contribución_plataforma, estado_validacion_dni, etc.).

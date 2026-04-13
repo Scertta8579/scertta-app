@@ -1,0 +1,59 @@
+# --- DEPENDENCIAS Y PAQUETES ---
+node_modules/
+.next/
+out/
+build/
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+
+# --- ANDROID (Lo que te está llenando de archivos) ---
+android/**/generated/
+android/app/debug/
+android/app/release/
+android/app/build/
+*.jks
+*.keystore
+*.apk
+*.aab
+
+# --- IOS ---
+ios/.generated/
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+DerivedData/
+
+# --- CONFIGURACIÓN Y SECRETOS ---
+.env*
+!.env.example
+.vercel
+*.pem
+
+# --- ARCHIVOS DE SISTEMA ---
+.DS_Store
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# --- BACKUPS / ARTEFACTOS QUE NO VAN AL REPO ---
+node_modules_RESPALDO/
+**/tsconfig.tsbuildinfo
+*.tsbuildinfo
+coverage/
+.idea/
+*.iml
+.vscode/
+android/.gradle/
+**/local.properties
+ios/Pods/
+ios/.symlinks/
+*.swp
+*.swo
+.cursor/
+
+# --- DOCS OPCIONALES (descomentar si no querés versionarlos) ---
+# *.md
+
+!.cursorrules
