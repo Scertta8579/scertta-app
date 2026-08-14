@@ -1,0 +1,58 @@
+name: iOS Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: 'App a compilar'
+        required: true
+        type: choice
+        options:
+          - rider
+          - driver
+          - flota
+          - todas
+  push:
+    branches: [main]
+    paths:
+      - 'apps/scertta_rider/**'
+      - 'apps/scertta_driver/**'
+      - 'apps/flota_rutmy/**'
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        app:
+          - scertta_rider
+          - scertta_driver
+          - flota_rutmy
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.0'
+          channel: 'stable'
+          cache: true
+
+      - name: Flutter pub get
+        working-directory: apps/${{ matrix.app }}
+        run: flutter pub get
+
+      - name: Build iOS (sin firma)
+        working-directory: apps/${{ matrix.app }}
+        run: |
+          flutter build ios --release --no-codesign
+          mkdir -p build/ios/Payload
+          cp -r build/ios/Release-iphoneos/Runner.app build/ios/Payload/
+          cd build/ios && zip -r ../../${{ matrix.app }}.ipa Payload
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.app }}-ios
+          path: apps/${{ matrix.app }}/${{ matrix.app }}.ipa

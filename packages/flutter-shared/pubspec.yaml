@@ -1,0 +1,25 @@
+name: flutter_shared
+description: Lógica compartida entre apps Flutter de Rutmy — servicios, modelos, widgets
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.24.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  supabase_flutter: ^2.8.0
+  http: ^1.2.0
+  shared_preferences: ^2.3.0
+  flutter_local_notifications: ^19.5.0
+  device_info_plus: ^11.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true

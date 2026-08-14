@@ -1,0 +1,37 @@
+
+============================================================
+📊 REPORTE TÉCNICO — FASE 4 Stress Test
+============================================================
+Fecha: 23/06/2026 15:05
+Duración: 19.2s (0.3 min)
+
+── CARGA SIMULADA ──
+✅ Ofertas de camiones (b2b_ofertas):  50/50
+✅ Viajes de pasajeros (viajes):       200/200
+✅ Consultas Valhalla:                 200/200
+✅ Errores:                            6
+
+── LATENCIAS (ms) ──
+📦 b2b_ofertas INSERT:  P50=445ms  P95=523ms
+🚗 viajes INSERT:       P50=301ms  P95=396ms
+🗺️ Valhalla /route:     P50=96ms  P95=163ms
+
+── CONSUMO ZIMAOS ──
+🧠 RAM:   pico=3.0GB  promedio=2.9GB
+⚡ CPU:   pico=39%  promedio=8%
+
+── ESTABILIDAD ──
+⚠️ Se detectaron errores (ver detalle)
+
+── DETALLE DE ERRORES ──
+valhalla_10: HTTP 400
+valhalla_37: HTTP 400
+valhalla_83: HTTP 400
+valhalla_81: HTTP 400
+valhalla_108: HTTP 400
+valhalla_163: HTTP 400
+
+
+============================================================
+VEREDICTO: ⚠️ REQUIERE ATENCIÓN
+============================================================

@@ -99,7 +99,7 @@ export default function ConfiguradorPromo({
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
             placeholder="ej: Promo Microcentro Lunes"
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-scertta-blue focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-rutmy-agua focus:border-transparent"
           />
           {errores.nombre && (
             <p className="text-red-500 text-xs mt-1">{errores.nombre}</p>
@@ -124,7 +124,7 @@ export default function ConfiguradorPromo({
               onChange={(e) => setPorcentajeDescuento(Number(e.target.value))}
               className="flex-1"
             />
-            <span className="text-2xl font-bold text-scertta-blue w-16 text-right">
+            <span className="text-2xl font-bold text-rutmy-agua w-16 text-right">
               {porcentajeDescuento}%
             </span>
           </div>
@@ -146,7 +146,7 @@ export default function ConfiguradorPromo({
               id="horarioInicio"
               value={horarioInicio}
               onChange={(e) => setHorarioInicio(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-scertta-blue focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-rutmy-agua focus:border-transparent"
             />
           </div>
           <div>
@@ -161,7 +161,7 @@ export default function ConfiguradorPromo({
               id="horarioFin"
               value={horarioFin}
               onChange={(e) => setHorarioFin(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-scertta-blue focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-rutmy-agua focus:border-transparent"
             />
           </div>
         </div>
@@ -190,7 +190,7 @@ export default function ConfiguradorPromo({
         <div className="flex gap-2 pt-2">
           <button
             type="submit"
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-scertta-blue text-white rounded-lg hover:bg-scertta-blue/90 transition-colors font-medium"
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-rutmy-agua text-rutmy-deep rounded-lg hover:bg-rutmy-agua/90 transition-colors font-medium"
           >
             <Save className="w-4 h-4" />
             Guardar Promoción

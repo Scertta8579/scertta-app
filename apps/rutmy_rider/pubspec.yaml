@@ -1,0 +1,49 @@
+name: rutmy
+description: Rutmy - Plataforma de Movilidad Premium
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_shared:
+    path: ../../packages/flutter-shared
+  
+
+  # Supabase
+  supabase_flutter: ^2.5.0
+  
+  # HTTP para llamar a Edge Functions
+  http: ^1.2.0
+  
+  # Mapas (flutter_map + tiles self-hosted Valhalla/PMTiles)
+  flutter_map: ^6.1.0
+  latlong2: ^0.9.0
+  
+  # Geolocalización
+  geolocator: ^11.0.0
+  
+  # UI
+  flutter_svg: ^2.0.9
+  google_fonts: ^6.1.0
+  
+  # URLs (WhatsApp, email, etc.)
+  url_launcher: ^6.2.0
+
+  # Permisos (onboarding; pánico sin diálogos del SO en el momento del toque)
+  permission_handler: ^11.3.1
+  shared_preferences: ^2.3.3
+  flutter_local_notifications: ^19.5.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_shared:
+    path: ../../packages/flutter-shared
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true

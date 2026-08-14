@@ -1,7 +1,8 @@
 "use client";
+import "@/lib/pmtiles-setup";
 
 import { useState, useEffect } from "react";
-import Map, { Marker, NavigationControl } from "react-map-gl/mapbox";
+import Map, { Marker, NavigationControl } from "react-map-gl/maplibre";
 import { 
   Car, 
   AlertCircle, 
@@ -10,7 +11,9 @@ import {
   Clock,
   Activity
 } from "lucide-react";
-import "mapbox-gl/dist/mapbox-gl.css";
+import "maplibre-gl/dist/maplibre-gl.css";
+import StressMonitor from "./StressMonitor";
+import PanelRentabilidad from "./PanelRentabilidad";
 
 interface Auto {
   id: string;
@@ -83,8 +86,6 @@ export default function AdminDashboard() {
 
   const [autoSeleccionado, setAutoSeleccionado] = useState<Auto | null>(null);
 
-  const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
-
   // Simulación de actualización de estado de autos
   useEffect(() => {
     const interval = setInterval(() => {
@@ -114,16 +115,6 @@ export default function AdminDashboard() {
   const autosEnAlerta = autos.filter((auto) => auto.estado === "alerta").length;
   const autosEnMovimiento = autos.filter((auto) => auto.estado === "movimiento").length;
   const autosDetenidos = autos.filter((auto) => auto.estado === "detenido").length;
-
-  if (!mapboxToken) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-black text-white">
-        <p className="text-red-500 font-semibold">
-          Error: Token de Mapbox no configurado
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-black text-white p-6">
@@ -201,8 +192,7 @@ export default function AdminDashboard() {
               <Map
                 {...viewState}
                 onMove={(evt) => setViewState(evt.viewState)}
-                mapStyle="mapbox://styles/mapbox/dark-v11"
-                mapboxAccessToken={mapboxToken}
+                mapStyle="https://rutmy.com/style.json"
                 style={{ width: "100%", height: "100%" }}
               >
                 <NavigationControl position="top-right" />
@@ -398,6 +388,14 @@ export default function AdminDashboard() {
               </div>
             )}
           </div>
+        </div>
+
+        {/* ── Panel de Rentabilidad ── */}
+        <PanelRentabilidad />
+
+        {/* ── Stress Monitor flotante ── */}
+        <div className="fixed bottom-6 right-6 z-50 w-72">
+          <StressMonitor />
         </div>
       </div>
     </div>

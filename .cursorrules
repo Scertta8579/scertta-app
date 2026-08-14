@@ -1,33 +1,95 @@
-# Scertta — Reglas del proyecto
+# 📖 Scertta / Rutmy — Matriz Maestra y Arquitectura Oficial
 
-## Qué estamos construyendo
-Scertta es una **plataforma de movilidad premium**. Todo el código y la comunicación deben alinearse con este producto.
+> Fuente de verdad ÚNICA del proyecto. Todo código, UI, documentación y respuestas
+> del sistema DEBEN regirse por este archivo. Ante cualquier conflicto con otra
+> fuente (skills, docs, memoria), ESTE archivo manda.
 
-## Stack técnico
-- **Next.js** (App Router)
-- **Tailwind CSS** para estilos
-- **Supabase** (Auth, base de datos, Storage)
-- **TypeScript** con tipado robusto (evitar `any`, tipar respuestas de API y estado)
+## 1. Regla de Idioma y Regionalización
 
-## Regla de oro
-- **No usar la palabra "Uber"** en código, comentarios, copy de UI ni documentación del proyecto.
+- **100% en ESPAÑOL**: código, comentarios, variables, UI, documentación y respuestas del sistema.
+- **Prohibido**: el término "Uber" u otras marcas comerciales. La marca comercial es **Rutmy** y la empresa SaaS madre es **Scertta**.
 
-## Roles de la plataforma
-Los roles definidos en la tabla `perfiles` y en la lógica de negocio son:
-- `ceo`
-- `operador`
-- `marketing`
-- `solicitante`
-- `conductor`
+## 2. Identidad Visual Obligatoria (VERDE AGUA como ACENTO y MARCA)
 
-Usar exactamente estos valores al crear perfiles, en el middleware y en `lib/auth.js`.
+- **Color oficial primario y acento**: `VERDE AGUA` = `#64DEB2`.
+- **Token global**: `--rutmy-agua: #64DEB2`.
+- **Regla de uso (UI de elite)**: el Verde Agua es el color **insignia de marca**, pero **NO debe inundar ni predominar como fondo** de las pantallas. Se usa como **ACENTO**: botones de acción principal (CTA), trazado activo del mapa, tarjetas destacadas, indicadores de estado e íconos seleccionados.
+- **Contraste WCAG AA (obligatorio, verificados)**: el Verde Agua `#64DEB2` tiene contraste **10.74:1 sobre fondo oscuro `#0F172A`** (PASA) pero **1.66:1 sobre fondo claro** (FALLA). Por lo tanto:
+  - **Texto sobre fondo VERDE AGUA**: SIEMPRE texto oscuro `#0F172A` (10.74:1), **NUNCA texto blanco** (1.66:1, ilegible). Aplica a botones CTA `bg-rutmy-agua` en PWA y `foregroundColor` de ElevatedButton en Flutter.
+  - **Texto/links sobre fondo CLARO**: usar verde agua oscuro `#0E7C5E` (5.17:1), reservando `#64DEB2` para acentos, íconos y Modo Oscuro.
+- **Fondos**:
+  - **Modo Oscuro**: fondo Negro / Gris Oscuro Tecno `#0F172A` / `#0B0F17`.
+  - **Modo Claro**: fondo Blanco o Gris Neutro Claro.
+- **Aplicación**: el Verde Agua (`#64DEB2`) es la identidad de acento/marca en **Modo Claro** y **Modo Oscuro** para:
+  - `rutmy_rider` (Flutter)
+  - `rutmy_driver` (Flutter)
+  - `flota_rutmy` (Flutter)
+  - `scertta_admin_web` (PWA Next.js)
+- **Prohibido usar** (reemplazar en Fase 1):
+  - Azul `#0B4BB3`, `#2563EB`
+  - Dorado `#D4A017`
+  - Cyan `#0891B2`
+  - Teal `#00838F`
 
-## Seguridad
-- **Rutas protegidas**: Verificar siempre que el usuario autenticado tenga el rol correcto antes de permitir acceso a `/ceo-dashboard`, `/back-office`, `/solicitante`, `/socio-conductor`, `/marketing`.
-- El middleware debe redirigir según `perfiles.rol` y no permitir acceso cruzado entre roles.
-- Rutas públicas explícitas (ej. `/solicitante/registro`, `/login`) deben estar definidas y no exigir sesión.
+## 3. Arquitectura B2B / Franquicias y Control de Acceso
 
-## Código
-- Preferir **TypeScript** con tipos explícitos.
-- Validar datos de formularios y respuestas de Supabase antes de usarlos.
-- Mantener la terminología legal/operativa acordada (solicitante, socio-conductor, contribución_plataforma, estado_validacion_dni, etc.).
+- **Scertta** (`scertta.com`): empresa matriz SaaS/B2B. El CEO Admin gestiona el alquiler de herramientas a las franquicias provinciales de Rutmy, cobrando un **% de Marketing Nacional** y un **% por uso de infraestructura**.
+- **Creación de Franquicia**: solo el CEO puede crear una franquicia y asignarle su **Gerente** y la **Llave de Franquicia**.
+- **Llave de Franquicia**: credencial de acceso vinculada a la provincia (ej. `buenosaires@rutmy.com`). No se usa para correo/mensajería, sino como **token de autenticación** para desbloquear el Panel Hub PWA con los datos y áreas de esa provincia.
+- **Panel Hub del Gerente**:
+  - Acceso total a todas las áreas de la franquicia local.
+  - Alta y vinculación de empleados a sus áreas por e-mail, con bloqueo de acceso instantáneo.
+  - **Módulo de Fichaje y Rendimiento**: control de acceso, horarios, tiempo de conexión diaria, desconexiones y registro de trabajos realizados por operario.
+  - Áreas diseñadas para estándares de elite competitiva (inicio en Buenos Aires, preparadas para escalabilidad multinacional).
+
+## 4. Infraestructura Híbrida y Repetidores
+
+- **Servidor Casero (1 TB) con ZimaOS** + **Instancia Oracle Cloud (12 GB RAM, 2 OCPU)**:
+  - Ambas arquitecturas corren sincronizadas como respaldo mutuo.
+  - ZimaOS reduce latencias locales en Argentina.
+  - Oracle garantiza alta disponibilidad si cae el servidor físico.
+- **Supabase**: base de datos relacional con **RLS** habilitado, **Autenticación** y **Supabase Realtime** para WebSockets.
+- **Integración de Memoria Hermes**: uso activo de **Graphify + Vault** para consultar antecedentes, mapa de dependencias y lógica del proyecto en cada análisis.
+
+## 5. Modelo de Negocio y Facturación (P2P Directo)
+
+- **Pagos de Viaje — P2P Directo**: el pasajero abona el **100% del viaje directamente al conductor** (Efectivo / Transferencia 3.0 / Transferencia al Alias directo del chofer).
+- **Cero retención de tarifa en el momento del viaje**: la plataforma NO retiene la tarifa al pagar. El cobro de la comisión se hace por separado (factura semanal).
+- **Comisión por Software (canon)**: la plataforma cobra un **porcentaje variable** (según promociones vigentes) sobre los **ingresos brutos del chofer, excluyendo propinas y peajes**.
+- **Cobro de Comisión por Software**: la plataforma emite una **factura ARCA semanal** por el canon de uso de herramientas/software a la franquicia / conductor.
+  - Scertta cobra a Rutmy, y Rutmy a los conductores.
+  - Primero se entrega al conductor un **detalle de deuda** especificando la semana.
+  - Una vez verificado el pago, se emite la factura de forma automatizada.
+- **Ciclo ARCA**:
+  - Cierre de ciclo: **domingos 23:59 hs**.
+  - Emisión de factura: **lunes** (Neto + IVA + IIBB).
+  - Período semanal: **lunes a domingo**.
+
+## 6. Especificaciones Elite de las Aplicaciones Flutter
+
+### App Pasajero (`rutmy_rider`)
+- **Medios de pago**: Efectivo, Transferencia 3.0 (QR) y Transferencia directa con datos/Alias cargados por el chofer (con envío de comprobante).
+- **Tipos de pasajero**: categorización explícita (Nuevo, Clásico, VIP, Empresa).
+- **Transparencia**: visualización de historial de viajes y estrellas del conductor.
+- **Aclaración por pago pendiente**: si el chofer marca que no cobró, se despliega un diálogo al pasajero para aclarar el motivo, pagar en el momento o diferir. Con **2 denuncias confirmadas de impago**, se suspende la opción de pedir viajes hasta regularizar.
+- **Seguridad de roles**: eliminación total de pantallas no-pasajero (`ceo_home`, `admin_home`, etc.).
+
+### App Conductor (`rutmy_driver`)
+- **Vista Lista estilo DiDi**: solicitudes en formato lista predeterminado con mapa interactivo que dibuje punto de origen, destino, paradas intermedias, recorrido completo, precio, distancia en km, tiempo estimado y nombres exactos de calles.
+- **Gestión dinámica de ruta**: notificación y alerta en tiempo real si el pasajero agrega, modifica o elimina una parada o destino en pleno viaje, exigiendo aceptación o rechazo explícito del conductor.
+- **Código Match de 6 dígitos**: generador alfanumérico aleatorio en la app del chofer. Al compartirlo con un pasajero, queda guardado su vínculo para solicitudes directas o reservas vía Push Notification. Si los conductores de match no aceptan, pasa automáticamente al radar general.
+- **Servicios ofrecidos**: selección de servicios en ajustes (Transporte de Pasajeros, Paquetes/Envíos).
+
+### App Socio Flota (`flota_rutmy`)
+- Dashboard ampliado para: asignación de choferes a unidades, mantenimiento, documentación, liquidaciones internas y sanciones.
+
+---
+
+## Reglas Técnicas Transversales
+
+- **Solo `pnpm`** (NUNCA `npm`).
+- **Stack**: Next.js (App Router) + Tailwind CSS + Supabase (Auth, DB, Storage, Realtime) + TypeScript con tipado robusto (evitar `any`).
+- **Roles oficiales**: `ceo_admin`, `gerente_franquicia`, `operador`, `marketing`, `finanzas`, `soporte`, `seguridad`, `solicitante`, `conductor`.
+- **Rutas protegidas**: verificar rol antes de permitir acceso; el middleware redirige según `perfiles.rol` sin acceso cruzado.
+- **Nomenclatura**: tablas y columnas en español, nombres completos, sin prefijos ni siglas.
+- **Cero alucinaciones**: ante la duda, preguntar o indicar limitaciones; nunca inventar datos.

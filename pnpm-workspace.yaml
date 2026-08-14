@@ -1,0 +1,5 @@
+packages:
+  - "apps/scertta_admin_web"
+allowBuilds:
+  sharp: true
+  unrs-resolver: true

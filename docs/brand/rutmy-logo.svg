@@ -1,0 +1,12 @@
+<svg width="220" height="56" viewBox="0 0 220 56" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="rg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#64DEB2"/>
+      <stop offset="100%" stop-color="#34D399"/>
+    </linearGradient>
+  </defs>
+  <path d="M23 12 C23 7 27 4 38 4 C49 4 53 7 53 12 C53 18 47 24 38 30 C29 24 23 18 23 12Z" fill="url(#rg)" opacity="0.95"/>
+  <circle cx="38" cy="11" r="4" fill="white"/>
+  <ellipse cx="38" cy="32" rx="8" ry="2.5" fill="#0F172A" opacity="0.12"/>
+  <text x="64" y="36" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="30" fill="#0F172A" letter-spacing="2.5">RUTMY</text>
+</svg>

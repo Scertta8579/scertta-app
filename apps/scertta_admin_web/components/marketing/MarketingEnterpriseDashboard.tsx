@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabaseClient";
 import MarketingPromoMapClient from "@/app/marketing/MarketingPromoMapClient";
+import GerenteEmbudoConversion from "@/components/ceo/GerenteEmbudoConversion";
 
 type SegmentId =
   | "nuevos"
@@ -535,6 +536,11 @@ export default function MarketingEnterpriseDashboard() {
             </div>
           </div>
         ) : null}
+      </div>
+
+      {/* Embudo de Conversión */}
+      <div className="mt-8">
+        <GerenteEmbudoConversion />
       </div>
     </div>
   );

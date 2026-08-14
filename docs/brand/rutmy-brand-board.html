@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rutmy — Logo & Brand Board</title>
+<style>
+  :root {
+    --deep: #0F172A;
+    --mint: #64DEB2;
+    --cyan: #0891B2;
+    --slate: #334155;
+    --stone: #78716C;
+    --white: #FFFFFF;
+    --sand: #F8FAFC;
+    --success: #059669;
+    --error: #DC2626;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--sand);
+    color: var(--slate);
+    min-height: 100vh;
+  }
+  header {
+    background: var(--deep);
+    padding: 2rem;
+    text-align: center;
+  }
+  header h1 { color: white; font-size: 1.5rem; letter-spacing: 0.05em; }
+  header p { color: var(--stone); margin-top: 0.25rem; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+  section { margin-bottom: 3rem; }
+  h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--deep);
+    border-bottom: 2px solid var(--mint);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .logo-row {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+  }
+  .logo-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    text-align: center;
+    min-width: 280px;
+  }
+  .logo-card.dark { background: var(--deep); }
+  .logo-card.white-bg { background: var(--white); border: 1px solid #E2E8F0; }
+  .logo-card h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--stone);
+    margin-bottom: 1.5rem;
+  }
+  .logo-card.dark h3 { color: #94A3B8; }
+  .swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+  }
+  .swatch {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .swatch-color {
+    height: 80px;
+    display: flex;
+    align-items: flex-end;
+    padding: 0.75rem;
+  }
+  .swatch-color span {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.2);
+  }
+  .swatch-info {
+    background: white;
+    padding: 0.75rem;
+    font-size: 0.8rem;
+  }
+  .swatch-info .name { font-weight: 600; color: var(--slate); }
+  .swatch-info .hex { color: var(--stone); font-family: monospace; margin-top: 0.15rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <svg width="180" height="48" viewBox="0 0 180 48" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="routeGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#64DEB2"/>
+        <stop offset="100%" stop-color="#34D399"/>
+      </linearGradient>
+    </defs>
+    <circle cx="19" cy="15" r="5" fill="none" stroke="url(#routeGrad)" stroke-width="2.5"/>
+    <path d="M19 20 L19 38" stroke="url(#routeGrad)" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M19 30 Q28 28 40 30" fill="none" stroke="url(#routeGrad)" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 2"/>
+    <circle cx="40" cy="30" r="4" fill="url(#routeGrad)"/>
+    <text x="52" y="34" font-family="'Segoe UI', system-ui, sans-serif" font-weight="700" font-size="28" fill="white" letter-spacing="3">RUTMY</text>
+  </svg>
+  <p>Brand Board</p>
+</header>
+
+<div class="container">
+
+  <!-- PASSPORT LOGO — Dark BG (app default) -->
+  <section>
+    <h2>Logo — Rutmy (Pasajero)</h2>
+    <div class="logo-row">
+      <div class="logo-card dark">
+        <h3>Dark BG · App</h3>
+        <svg width="220" height="56" viewBox="0 0 220 56" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="rg1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#64DEB2"/>
+              <stop offset="100%" stop-color="#34D399"/>
+            </linearGradient>
+          </defs>
+          <path d="M23 12 C23 7 27 4 38 4 C49 4 53 7 53 12 C53 18 47 24 38 30 C29 24 23 18 23 12Z" fill="url(#rg1)"/>
+          <circle cx="38" cy="11" r="4" fill="#0F172A"/>
+          <ellipse cx="38" cy="32" rx="8" ry="2.5" fill="white" opacity="0.08"/>
+          <text x="64" y="36" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="30" fill="white" letter-spacing="2.5">RUTMY</text>
+        </svg>
+      </div>
+      <div class="logo-card white-bg">
+        <h3>White BG · Web</h3>
+        <svg width="220" height="56" viewBox="0 0 220 56" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="rg1w" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#64DEB2"/>
+              <stop offset="100%" stop-color="#34D399"/>
+            </linearGradient>
+          </defs>
+          <path d="M23 12 C23 7 27 4 38 4 C49 4 53 7 53 12 C53 18 47 24 38 30 C29 24 23 18 23 12Z" fill="url(#rg1w)" opacity="0.95"/>
+          <circle cx="38" cy="11" r="4" fill="white"/>
+          <ellipse cx="38" cy="32" rx="8" ry="2.5" fill="#0F172A" opacity="0.12"/>
+          <text x="64" y="36" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="30" fill="#0F172A" letter-spacing="2.5">RUTMY</text>
+        </svg>
+      </div>
+      <div class="logo-card dark">
+        <h3>Icon only</h3>
+        <svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="rg3i" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#64DEB2"/>
+              <stop offset="100%" stop-color="#34D399"/>
+            </linearGradient>
+          </defs>
+          <circle cx="40" cy="40" r="36" fill="none" stroke="url(#rg3i)" stroke-width="3"/>
+          <path d="M28 22 C28 18 31.5 16 40 16 C48.5 16 52 18 52 22 C52 27 47 32 40 37 C33 32 28 27 28 22Z" fill="url(#rg3i)"/>
+          <circle cx="40" cy="21" r="5" fill="#0F172A"/>
+          <path d="M40 40 L40 62" stroke="#64DEB2" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="40" cy="62" r="3" fill="#64DEB2"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- DRIVER LOGO -->
+  <section>
+    <h2>Logo — Rutmy Drive (Conductor)</h2>
+    <div class="logo-row">
+      <div class="logo-card dark">
+        <h3>Dark BG · App</h3>
+        <svg width="260" height="56" viewBox="0 0 280 56" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="rd1d" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#64DEB2"/>
+              <stop offset="100%" stop-color="#34D399"/>
+            </linearGradient>
+          </defs>
+          <path d="M23 12 C23 7 27 4 38 4 C49 4 53 7 53 12 C53 18 47 24 38 30 C29 24 23 18 23 12Z" fill="url(#rd1d)"/>
+          <circle cx="38" cy="11" r="4" fill="#0F172A"/>
+          <ellipse cx="38" cy="32" rx="8" ry="2.5" fill="white" opacity="0.08"/>
+          <text x="64" y="36" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="30" fill="white" letter-spacing="2.5">RUTMY</text>
+          <rect x="208" y="8" width="65" height="26" rx="13" fill="#06B6D4" opacity="0.2" stroke="#06B6D4" stroke-width="1"/>
+          <text x="240" y="26" font-family="system-ui, -apple-system, sans-serif" font-weight="600" font-size="14" fill="#06B6D4" text-anchor="middle">DRIVE</text>
+        </svg>
+      </div>
+      <div class="logo-card white-bg">
+        <h3>White BG · Web</h3>
+        <svg width="260" height="56" viewBox="0 0 280 56" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="rd2w" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#64DEB2"/>
+              <stop offset="100%" stop-color="#34D399"/>
+            </linearGradient>
+          </defs>
+          <path d="M23 12 C23 7 27 4 38 4 C49 4 53 7 53 12 C53 18 47 24 38 30 C29 24 23 18 23 12Z" fill="url(#rd2w)" opacity="0.95"/>
+          <circle cx="38" cy="11" r="4" fill="white"/>
+          <ellipse cx="38" cy="32" rx="8" ry="2.5" fill="#0F172A" opacity="0.12"/>
+          <text x="64" y="36" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="30" fill="#0F172A" letter-spacing="2.5">RUTMY</text>
+          <rect x="208" y="8" width="65" height="26" rx="13" fill="#0891B2" opacity="0.12"/>
+          <text x="240" y="26" font-family="system-ui, -apple-system, sans-serif" font-weight="600" font-size="14" fill="#0891B2" text-anchor="middle">DRIVE</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- APP ICONS -->
+  <section>
+    <h2>App Icons</h2>
+    <div class="logo-row">
+      <div class="logo-card dark">
+        <h3>Rutmy — Pasajero</h3>
+        <svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="abg1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#0F172A"/>
+              <stop offset="100%" stop-color="#1E293B"/>
+            </linearGradient>
+            <linearGradient id="apin1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#64DEB2"/>
+              <stop offset="100%" stop-color="#34D399"/>
+            </linearGradient>
+          </defs>
+          <rect width="100" height="100" rx="22" fill="url(#abg1)"/>
+          <path d="M33 30 C33 23 38 18 50 18 C62 18 67 23 67 30 C67 38 60 45 50 52 C40 45 33 38 33 30Z" fill="url(#apin1)"/>
+          <circle cx="50" cy="28" r="6" fill="#0F172A"/>
+          <path d="M50 54 L50 78" stroke="#64DEB2" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="50" cy="78" r="4" fill="#64DEB2" opacity="0.8"/>
+        </svg>
+      </div>
+      <div class="logo-card dark">
+        <h3>Rutmy Drive — Conductor</h3>
+        <svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="abg2" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#0F172A"/>
+              <stop offset="100%" stop-color="#1E293B"/>
+            </linearGradient>
+            <linearGradient id="apin2" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#64DEB2"/>
+              <stop offset="100%" stop-color="#34D399"/>
+            </linearGradient>
+          </defs>
+          <rect width="100" height="100" rx="22" fill="url(#abg2)"/>
+          <path d="M33 30 C33 23 38 18 50 18 C62 18 67 23 67 30 C67 38 60 45 50 52 C40 45 33 38 33 30Z" fill="url(#apin2)"/>
+          <circle cx="50" cy="28" r="6" fill="#0F172A"/>
+          <path d="M50 54 L50 78" stroke="#0891B2" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="50" cy="78" r="4" fill="#0891B2"/>
+          <line x1="30" y1="76" x2="20" y2="82" stroke="#64DEB2" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+          <line x1="28" y1="82" x2="18" y2="88" stroke="#64DEB2" stroke-width="1.5" stroke-linecap="round" opacity="0.3"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- PALETTE -->
+  <section>
+    <h2>Paleta de Color</h2>
+    <div class="swatches">
+      <div class="swatch">
+        <div class="swatch-color" style="background:#0F172A"><span style="color:#0F172A">Deep</span></div>
+        <div class="swatch-info"><div class="name">Deep</div><div class="hex">#0F172A</div><div>Fondo app · Navbar · Branding</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#64DEB2"><span style="color:#064E3B">Mint</span></div>
+        <div class="swatch-info"><div class="name">Mint</div><div class="hex">#64DEB2</div><div>Acento principal · Logo · CTA</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#0891B2"><span style="color:#0891B2">Cyan</span></div>
+        <div class="swatch-info"><div class="name">Cyan</div><div class="hex">#0891B2</div><div>Drive tag · Activo · Links</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#334155"><span style="color:#334155">Slate</span></div>
+        <div class="swatch-info"><div class="name">Slate</div><div class="hex">#334155</div><div>Texto primario</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#FFFFFF; border:1px solid #E2E8F0"><span style="color:#78716C">White</span></div>
+        <div class="swatch-info"><div class="name">White</div><div class="hex">#FFFFFF</div><div>Fondo web · Transparencia</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#F8FAFC; border:1px solid #E2E8F0"><span style="color:#78716C">Sand</span></div>
+        <div class="swatch-info"><div class="name">Sand</div><div class="hex">#F8FAFC</div><div>Fondo alternativo · Cards</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#059669"><span style="color:#059669">Success</span></div>
+        <div class="swatch-info"><div class="name">Success</div><div class="hex">#059669</div><div>Confirmación</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#DC2626"><span style="color:#DC2626">Error</span></div>
+        <div class="swatch-info"><div class="name">Error</div><div class="hex">#DC2626</div><div>Error · Cancelar</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Reglas de uso</h2>
+    <p style="font-size:0.95rem; color:var(--slate); line-height:1.6">
+      <strong>App (Flutter):</strong> fondo oscuro <code style="background:#0F172A;color:#64DEB2;padding:2px 6px;border-radius:4px">#0F172A</code>, pin mint, texto blanco.<br>
+      <strong>Web (Next.js):</strong> fondo blanco <code style="background:#F8FAFC;padding:2px 6px;border-radius:4px">#FFFFFF</code> para transmitir transparencia y confianza.<br>
+      <strong>Pin:</strong> siempre <code style="background:#64DEB2;color:#064E3B;padding:2px 6px;border-radius:4px">#64DEB2</code> con degradado a #34D399.<br>
+      <strong>Drive tag:</strong> <code style="background:#0891B2;color:white;padding:2px 6px;border-radius:4px">#0891B2</code> para diferenciar la app de conductor.
+    </p>
+  </section>
+
+</div>
+</body>
+</html>

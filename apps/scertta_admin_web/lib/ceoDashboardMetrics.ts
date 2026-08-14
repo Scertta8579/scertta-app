@@ -110,11 +110,12 @@ export async function fetchDocumentosPendientes(
     .in("status", ["pending", "requires_review"]);
   if (!v1.error && v1.count !== null) return v1.count;
 
-  const v2 = await supabase
-    .from("documentos_validacion")
-    .select("*", { count: "exact", head: true })
-    .eq("estado_validacion", "pendiente");
-  if (!v2.error && v2.count !== null) return v2.count;
+  // [NEUTRALIZADO] Tabla documentos_validacion no existe en DB (404)
+  // const v2 = await supabase
+  //   .from("documentos_validacion")
+  //   .select("*", { count: "exact", head: true })
+  //   .eq("estado_validacion", "pendiente");
+  // if (!v2.error && v2.count !== null) return v2.count;
 
   return null;
 }
@@ -345,38 +346,42 @@ export async function fetchConversionFunnel(
     .eq("status", "searching");
   if (!searching.error) out.buscandoViaje = searching.count ?? 0;
 
-  const matched = await supabase
-    .from("trips")
-    .select("*", { count: "exact", head: true })
-    .eq("status", "matched");
-  if (!matched.error) out.match = matched.count ?? 0;
+  // [NEUTRALIZADO] Tabla trips no existe en DB (404) — defaults a 0
+  // const matched = await supabase
+  //   .from("trips")
+  //   .select("*", { count: "exact", head: true })
+  //   .eq("status", "matched");
+  // if (!matched.error) out.match = matched.count ?? 0;
+  out.match = 0;
 
-  const enViajeA = await supabase
-    .from("trips")
-    .select("*", { count: "exact", head: true })
-    .eq("status", "in_progress");
-  const enViajeB = await supabase
-    .from("trips")
-    .select("*", { count: "exact", head: true })
-    .eq("status", "active");
-  let ev = 0;
-  let evOk = false;
-  if (!enViajeA.error) {
-    ev += enViajeA.count ?? 0;
-    evOk = true;
-  }
-  if (!enViajeB.error) {
-    ev += enViajeB.count ?? 0;
-    evOk = true;
-  }
-  if (evOk) out.enViaje = ev;
+  // const enViajeA = await supabase
+  //   .from("trips")
+  //   .select("*", { count: "exact", head: true })
+  //   .eq("status", "in_progress");
+  // const enViajeB = await supabase
+  //   .from("trips")
+  //   .select("*", { count: "exact", head: true })
+  //   .eq("status", "active");
+  // let ev = 0;
+  // let evOk = false;
+  // if (!enViajeA.error) {
+  //   ev += enViajeA.count ?? 0;
+  //   evOk = true;
+  // }
+  // if (!enViajeB.error) {
+  //   ev += enViajeB.count ?? 0;
+  //   evOk = true;
+  // }
+  // if (evOk) out.enViaje = ev;
+  out.enViaje = 0;
 
-  const done = await supabase
-    .from("trips")
-    .select("*", { count: "exact", head: true })
-    .eq("status", "completed")
-    .gte("completed_at", dayStart);
-  if (!done.error) out.finalizadoHoy = done.count ?? 0;
+  // const done = await supabase
+  //   .from("trips")
+  //   .select("*", { count: "exact", head: true })
+  //   .eq("status", "completed")
+  //   .gte("completed_at", dayStart);
+  // if (!done.error) out.finalizadoHoy = done.count ?? 0;
+  out.finalizadoHoy = 0;
 
   return out;
 }

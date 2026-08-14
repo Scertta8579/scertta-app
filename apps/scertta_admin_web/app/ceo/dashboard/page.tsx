@@ -1,564 +1,438 @@
 "use client";
 
-import { useState } from "react";
-import { 
-  AlertCircle, 
-  CheckCircle2, 
-  Users, 
-  Clock, 
-  Activity,
-  Pause,
-  TrendingUp,
-  Settings,
-  BarChart3,
-  DollarSign,
-  Percent,
-  Save,
-  MapPin
+import { useState, useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  AlertCircle, Car, TrendingUp, DollarSign,
+  Percent, Settings, BarChart3, RefreshCw,
+  Users, Headphones, FileWarning, CheckCircle2,
+  Activity, CreditCard, Wallet
 } from "lucide-react";
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer, AreaChart, Area,
+  PieChart, Pie, Cell, Legend
+} from "recharts";
+import { supabase } from "@/lib/supabaseClient";
+import { useCeoDashboard } from "@/hooks/useCeoDashboard";
+import { useQueryClient } from "@tanstack/react-query";
 
-interface Admin {
-  id: string;
-  nombre: string;
-  horaConexion: string;
-  estado: "Activo" | "Pausa";
-  casosResueltos: number;
+// ── Paleta Rutmy ──
+const COLORS = {
+  gold: "#64DEB2",
+  cyan: "#64DEB2",
+  deep: "#0F172A",
+  success: "#059669",
+  error: "#DC2626",
+  slate: "#334155",
+  stone: "#78716C",
+};
+
+const CHART_COLORS = [COLORS.cyan, COLORS.gold, COLORS.success, COLORS.slate, "#7C3AED"];
+
+// ── Validación Zod ──
+const commissionSchema = z.object({
+  comision_pct: z.number().min(0).max(50, "Máximo 50%"),
+  gastos_operativos_pct: z.number().min(0).max(30, "Máximo 30%"),
+});
+
+type CommissionForm = z.infer<typeof commissionSchema>;
+
+// ── Helpers ──
+function fmtARS(n: number | null | undefined): string {
+  if (n === null || n === undefined) return "—";
+  return "$" + n.toLocaleString("es-AR");
 }
 
-interface Ticket {
-  id: string;
-  solicitante: string;
-  descripcion: string;
-  minutosEspera: number;
-  prioridad: "alta" | "media" | "baja";
+function fmtNum(n: number | null | undefined): string {
+  if (n === null || n === undefined) return "—";
+  return n.toLocaleString("es-AR");
 }
+
+type Tab = "dashboard" | "config";
 
 export default function CEODashboard() {
-  const [tabActiva, setTabActiva] = useState<"dashboard" | "configuracion">("dashboard");
-  const [guardando, setGuardando] = useState(false);
-  
-  const [adminsActivos] = useState<Admin[]>([
-    { id: "1", nombre: "María González", horaConexion: "08:30", estado: "Activo", casosResueltos: 12 },
-    { id: "2", nombre: "Carlos Ruiz", horaConexion: "09:00", estado: "Activo", casosResueltos: 8 },
-    { id: "3", nombre: "Ana Martínez", horaConexion: "08:45", estado: "Pausa", casosResueltos: 15 },
-    { id: "4", nombre: "Jorge López", horaConexion: "10:00", estado: "Activo", casosResueltos: 5 },
-  ]);
+  const [tab, setTab] = useState<Tab>("dashboard");
+  const queryClient = useQueryClient();
+  const {
+    operations, todayFinance, monthFinance,
+    dailyRange, monthlyTrend, commission, revenueBreakdown,
+    isLoading,
+  } = useCeoDashboard();
 
-  const [ticketsPendientes] = useState<Ticket[]>([
-    { id: "T-001", solicitante: "Pedro Sánchez", descripcion: "Solicitud de viaje urgente", minutosEspera: 12, prioridad: "alta" },
-    { id: "T-002", solicitante: "Laura Díaz", descripcion: "Cambio de destino", minutosEspera: 8, prioridad: "media" },
-    { id: "T-003", solicitante: "Roberto Flores", descripcion: "Consulta sobre tarifa", minutosEspera: 5, prioridad: "baja" },
-    { id: "T-004", solicitante: "Sofía Ramírez", descripcion: "Problema con pago", minutosEspera: 11, prioridad: "alta" },
-    { id: "T-005", solicitante: "Miguel Torres", descripcion: "Actualización de datos", minutosEspera: 3, prioridad: "media" },
-  ]);
+  // ── Form de comisión ──
+  const {
+    register, handleSubmit, formState: { errors, isSubmitting },
+    reset,
+  } = useForm<CommissionForm>({
+    resolver: zodResolver(commissionSchema),
+    values: useMemo(() => ({
+      comision_pct: commission.data?.comision_scertta_pct ?? 15,
+      gastos_operativos_pct: commission.data?.gastos_operativos_pct ?? 7.9,
+    }), [commission.data]),
+  });
 
-  const [comisionActiva, setComisionActiva] = useState(false);
-  const [suscripcionActiva, setSuscripcionActiva] = useState(false);
-  const [porcentajeComision, setPorcentajeComision] = useState(15);
-  const [montoSuscripcion, setMontoSuscripcion] = useState("");
-  const [frecuenciaSuscripcion, setFrecuenciaSuscripcion] = useState<"semanal" | "mensual">("semanal");
-
-  const casosPendientes = ticketsPendientes.length;
-  const casosConAlerta = ticketsPendientes.filter(t => t.minutosEspera > 10).length;
-  const casosResueltosHoy = 42;
-  const administradoresConectados = adminsActivos.length;
-
-  const handleAplicarCambios = async () => {
-    setGuardando(true);
-    
-    // Simulación de guardado (aquí irá la llamada a Supabase)
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    console.log("Configuración guardada:", {
-      comisionActiva,
-      porcentajeComision: comisionActiva ? porcentajeComision : null,
-      suscripcionActiva,
-      montoSuscripcion: suscripcionActiva ? montoSuscripcion : null,
-      frecuenciaSuscripcion: suscripcionActiva ? frecuenciaSuscripcion : null
+  const onSaveCommission = async (data: CommissionForm) => {
+    await supabase.from("commission_config").upsert({
+      id: 1,
+      comision_scertta_pct: data.comision_pct,
+      gastos_operativos_pct: data.gastos_operativos_pct,
     });
-    
-    setGuardando(false);
-    alert("✓ Configuración guardada exitosamente");
+    queryClient.invalidateQueries({ queryKey: ["ceo", "commission"] });
   };
 
+  const ops = operations.data;
+  const fin = todayFinance.data;
+  const mfin = monthFinance.data;
+
+  // ── Datos para gráficos ──
+  const trendData = useMemo(() =>
+    monthlyTrend.data?.map(d => ({
+      fecha: d.date_bucket.slice(5), // MM-DD
+      ingresos: d.gross_revenue,
+      neto: d.net_revenue,
+      viajes: d.trips_count,
+    })) ?? [],
+  [monthlyTrend.data]);
+
+  const paymentData = useMemo(() =>
+    revenueBreakdown.data?.byPayment?.map(p => ({
+      name: p.payment_method,
+      value: p.gross,
+      trips: p.trips,
+    })) ?? [],
+  [revenueBreakdown.data]);
+
   return (
-    <div className="min-h-screen bg-black text-white p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-rutmy-sand dark:bg-rutmy-deep">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
+        {/* ── Header ── */}
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
           <div>
-            <h1 className="text-4xl font-extrabold tracking-tight">
-              <span translate="no" className="notranslate">Scertta</span> CEO Dashboard
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-rutmy-deep dark:text-white">
+              Rutmy CEO
             </h1>
-            <p className="text-zinc-400 mt-1">Panel de Control Ejecutivo</p>
-          </div>
-          <div className="text-right">
-            <p className="text-sm text-zinc-500">Actualizado en tiempo real</p>
-            <p className="text-lg font-semibold text-blue-400">
-              {new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+            <p className="text-rutmy-stone dark:text-rutmy-stone mt-1 text-sm">
+              Panel de Control Ejecutivo — Scertta SaaS
             </p>
           </div>
-        </div>
-
-        {/* Pestañas de Navegación */}
-        <div className="flex gap-2 border-b border-zinc-800">
-          <button
-            onClick={() => setTabActiva("dashboard")}
-            className={`flex items-center gap-2 px-6 py-3 font-semibold transition-all relative ${
-              tabActiva === "dashboard"
-                ? "text-blue-400"
-                : "text-zinc-500 hover:text-zinc-300"
-            }`}
-          >
-            <BarChart3 size={20} />
-            Dashboard
-            {tabActiva === "dashboard" && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500"></div>
-            )}
-          </button>
-          <button
-            onClick={() => setTabActiva("configuracion")}
-            className={`flex items-center gap-2 px-6 py-3 font-semibold transition-all relative ${
-              tabActiva === "configuracion"
-                ? "text-blue-400"
-                : "text-zinc-500 hover:text-zinc-300"
-            }`}
-          >
-            <Settings size={20} />
-            Configuración de Negocio
-            {tabActiva === "configuracion" && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500"></div>
-            )}
-          </button>
-        </div>
-
-        {/* Contenido según pestaña activa */}
-        {tabActiva === "dashboard" ? (
-          <>
-            {/* Métricas Generales */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Casos Pendientes */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 relative overflow-hidden">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-zinc-400 text-sm font-medium">Casos Pendientes</p>
-                <p className="text-4xl font-bold mt-2">{casosPendientes}</p>
-                {casosConAlerta > 0 && (
-                  <div className="flex items-center gap-2 mt-3 text-red-500">
-                    <AlertCircle size={16} />
-                    <span className="text-xs font-semibold">
-                      {casosConAlerta} casos superan SLA
-                    </span>
-                  </div>
-                )}
-              </div>
-              <div className="bg-red-500/10 p-3 rounded-xl">
-                <Clock className="text-red-500" size={24} />
-              </div>
-            </div>
-            {casosConAlerta > 0 && (
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 to-orange-500"></div>
-            )}
-          </div>
-
-          {/* Casos Resueltos Hoy */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 relative overflow-hidden">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-zinc-400 text-sm font-medium">Resueltos Hoy</p>
-                <p className="text-4xl font-bold mt-2">{casosResueltosHoy}</p>
-                <div className="flex items-center gap-2 mt-3 text-green-500">
-                  <TrendingUp size={16} />
-                  <span className="text-xs font-semibold">+18% vs ayer</span>
-                </div>
-              </div>
-              <div className="bg-green-500/10 p-3 rounded-xl">
-                <CheckCircle2 className="text-green-500" size={24} />
-              </div>
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 to-emerald-500"></div>
-          </div>
-
-          {/* Administradores Conectados */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 relative overflow-hidden">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-zinc-400 text-sm font-medium">Admins Conectados</p>
-                <p className="text-4xl font-bold mt-2">{administradoresConectados}</p>
-                <div className="flex items-center gap-2 mt-3 text-blue-500">
-                  <Activity size={16} />
-                  <span className="text-xs font-semibold">En línea ahora</span>
-                </div>
-              </div>
-              <div className="bg-blue-500/10 p-3 rounded-xl">
-                <Users className="text-blue-500" size={24} />
-              </div>
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-500"></div>
+          <div className="flex items-center gap-2 text-sm text-rutmy-stone">
+            <Activity size={16} className="text-rutmy-success" />
+            <span>Actualizado {new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}</span>
+            <button
+              onClick={() => queryClient.invalidateQueries()}
+              className="ml-2 p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition"
+              title="Refrescar datos"
+            >
+              <RefreshCw size={16} className={isLoading ? "animate-spin" : ""} />
+            </button>
           </div>
         </div>
 
-        {/* Monitor de Personal */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">Monitor de Personal</h2>
-            <div className="flex items-center gap-2 text-sm text-zinc-400">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span>En vivo</span>
-            </div>
-          </div>
-          
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-zinc-800">
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-zinc-400">Administrador</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-zinc-400">Hora Conexión</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-zinc-400">Estado</th>
-                  <th className="text-right py-3 px-4 text-sm font-semibold text-zinc-400">Casos Resueltos</th>
-                </tr>
-              </thead>
-              <tbody>
-                {adminsActivos.map((admin) => (
-                  <tr key={admin.id} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
-                    <td className="py-4 px-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center font-bold">
-                          {admin.nombre.split(' ').map(n => n[0]).join('')}
-                        </div>
-                        <span className="font-medium">{admin.nombre}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4 text-zinc-300">
-                      <div className="flex items-center gap-2">
-                        <Clock size={14} className="text-zinc-500" />
-                        {admin.horaConexion}
-                      </div>
-                    </td>
-                    <td className="py-4 px-4">
-                      {admin.estado === "Activo" ? (
-                        <span className="inline-flex items-center gap-2 px-3 py-1 bg-green-500/10 border border-green-500/30 rounded-full text-green-500 text-xs font-semibold">
-                          <Activity size={12} />
-                          Activo
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-2 px-3 py-1 bg-orange-500/10 border border-orange-500/30 rounded-full text-orange-500 text-xs font-semibold">
-                          <Pause size={12} />
-                          Pausa
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-4 px-4 text-right">
-                      <span className="text-2xl font-bold text-blue-400">{admin.casosResueltos}</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        {/* ── Tabs ── */}
+        <div className="flex gap-1 border-b border-black/10 dark:border-white/10 pb-0">
+          {([
+            ["dashboard", "Dashboard", BarChart3],
+            ["config", "Configuración", Settings],
+          ] as const).map(([id, label, Icon]) => (
+            <button
+              key={id}
+              onClick={() => setTab(id)}
+              className={`flex items-center gap-2 px-5 py-3 text-sm font-semibold rounded-t-xl transition-all relative ${
+                tab === id
+                  ? "text-rutmy-agua bg-white dark:bg-rutmy-deep"
+                  : "text-rutmy-stone hover:text-rutmy-deep dark:hover:text-white"
+              }`}
+            >
+              <Icon size={18} />
+              {label}
+              {tab === id && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-rutmy-agua" />
+              )}
+            </button>
+          ))}
         </div>
 
-        {/* Cola de Trabajo */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">Cola de Trabajo</h2>
-            <span className="text-sm text-zinc-400">Ordenado por antigüedad</span>
-          </div>
-
-          <div className="space-y-3">
-            {ticketsPendientes.map((ticket) => {
-              const esUrgente = ticket.minutosEspera > 10;
-              const esCritico = ticket.minutosEspera > 9;
-              
-              return (
-                <div 
-                  key={ticket.id}
-                  className={`p-4 rounded-xl border transition-all ${
-                    esUrgente 
-                      ? 'bg-red-500/5 border-red-500/50 shadow-lg shadow-red-500/10' 
-                      : esCritico
-                      ? 'bg-orange-500/5 border-orange-500/30'
-                      : 'bg-zinc-800/50 border-zinc-700'
-                  }`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="font-mono text-sm font-bold text-blue-400">{ticket.id}</span>
-                        <span className="text-zinc-300 font-medium">{ticket.solicitante}</span>
-                        {esUrgente && (
-                          <span className="flex items-center gap-1 px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full animate-pulse">
-                            <AlertCircle size={12} />
-                            SLA CRÍTICO
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-zinc-400">{ticket.descripcion}</p>
-                    </div>
-                    <div className="text-right ml-4">
-                      <div className={`text-2xl font-bold ${
-                        esUrgente ? 'text-red-500' : esCritico ? 'text-orange-500' : 'text-zinc-400'
-                      }`}>
-                        {ticket.minutosEspera}m
-                      </div>
-                      <p className="text-xs text-zinc-500 mt-1">en espera</p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-          </>
-        ) : (
-          /* Configuración de Negocio */
+        {tab === "dashboard" ? (
           <div className="space-y-6">
-            {/* Panel de Configuración de Tarifas */}
-            <div className="bg-zinc-900 border-2 border-blue-500/30 rounded-2xl p-8 shadow-2xl shadow-blue-500/10">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="bg-blue-500/10 p-3 rounded-xl">
-                  <DollarSign className="text-blue-400" size={28} />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold">Modelo de Ingresos</h2>
-                  <p className="text-zinc-400 text-sm">Configura cómo monetizar la plataforma</p>
-                </div>
-              </div>
-
-              {/* Switches Independientes */}
-              <div className="space-y-6 mb-8">
-                {/* Switch Comisión */}
-                <div className={`p-6 rounded-xl border-2 transition-all ${
-                  comisionActiva 
-                    ? "border-blue-500/50 bg-blue-500/5" 
-                    : "border-zinc-800 bg-zinc-900"
-                }`}>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <Percent className={comisionActiva ? "text-blue-400" : "text-zinc-500"} size={24} />
-                      <div>
-                        <h3 className="text-lg font-bold">Activar Comisión (%)</h3>
-                        <p className="text-sm text-zinc-400">Cobra un porcentaje sobre cada viaje</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setComisionActiva(!comisionActiva)}
-                      className={`relative w-14 h-7 rounded-full transition-all ${
-                        comisionActiva ? "bg-blue-500" : "bg-zinc-700"
-                      }`}
-                    >
-                      <div className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform ${
-                        comisionActiva ? "translate-x-7" : "translate-x-0"
-                      }`}></div>
-                    </button>
-                  </div>
-
-                  {comisionActiva && (
-                    <div className="pt-4 border-t border-zinc-800">
-                      <label className="block text-sm font-semibold text-zinc-400 mb-3">
-                        Porcentaje de Comisión
-                      </label>
-                      <div className="relative">
-                        <Percent className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={20} />
-                        <input
-                          type="number"
-                          min="0"
-                          max="100"
-                          step="0.5"
-                          value={porcentajeComision}
-                          onChange={(e) => setPorcentajeComision(Number(e.target.value))}
-                          className="w-full bg-zinc-950 border-2 border-zinc-800 rounded-xl pl-12 pr-4 py-4 text-2xl font-bold text-blue-400 outline-none focus:border-blue-500"
-                          placeholder="15"
-                        />
-                      </div>
-                      <p className="text-xs text-zinc-500 mt-2">
-                        Se aplicará sobre el valor total de cada viaje realizado
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Switch Suscripción */}
-                <div className={`p-6 rounded-xl border-2 transition-all ${
-                  suscripcionActiva 
-                    ? "border-blue-500/50 bg-blue-500/5" 
-                    : "border-zinc-800 bg-zinc-900"
-                }`}>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <DollarSign className={suscripcionActiva ? "text-blue-400" : "text-zinc-500"} size={24} />
-                      <div>
-                        <h3 className="text-lg font-bold">Activar Suscripción Fija</h3>
-                        <p className="text-sm text-zinc-400">Cobra una tarifa periódica a los conductores</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setSuscripcionActiva(!suscripcionActiva)}
-                      className={`relative w-14 h-7 rounded-full transition-all ${
-                        suscripcionActiva ? "bg-blue-500" : "bg-zinc-700"
-                      }`}
-                    >
-                      <div className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform ${
-                        suscripcionActiva ? "translate-x-7" : "translate-x-0"
-                      }`}></div>
-                    </button>
-                  </div>
-
-                  {suscripcionActiva && (
-                    <div className="pt-4 border-t border-zinc-800 space-y-4">
-                      <div>
-                        <label className="block text-sm font-semibold text-zinc-400 mb-3">
-                          Monto en Pesos Argentinos (ARS)
-                        </label>
-                        <div className="relative">
-                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-xl font-bold">$</span>
-                          <input
-                            type="text"
-                            value={montoSuscripcion}
-                            onChange={(e) => {
-                              const value = e.target.value.replace(/\D/g, '');
-                              setMontoSuscripcion(value);
-                            }}
-                            className="w-full bg-zinc-950 border-2 border-zinc-800 rounded-xl pl-12 pr-4 py-4 text-2xl font-bold text-blue-400 outline-none focus:border-blue-500"
-                            placeholder="10000"
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-semibold text-zinc-400 mb-3">
-                          Frecuencia de Cobro
-                        </label>
-                        <select
-                          value={frecuenciaSuscripcion}
-                          onChange={(e) => setFrecuenciaSuscripcion(e.target.value as "semanal" | "mensual")}
-                          className="w-full bg-zinc-950 border-2 border-zinc-800 rounded-xl px-4 py-4 text-lg font-semibold text-blue-400 outline-none focus:border-blue-500 cursor-pointer"
-                        >
-                          <option value="semanal">Semanal</option>
-                          <option value="mensual">Mensual</option>
-                        </select>
-                      </div>
-
-                      <p className="text-xs text-zinc-500">
-                        Monto que pagará cada conductor de forma {frecuenciaSuscripcion}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Resumen de Configuración Actual */}
-              <div className="bg-zinc-950 border-2 border-blue-500/30 rounded-xl p-6 mb-6">
-                <h3 className="text-sm font-semibold text-zinc-400 mb-3">Configuración Activa</h3>
-                <div>
-                  {!comisionActiva && !suscripcionActiva ? (
-                    <p className="text-zinc-500 italic">No hay ningún modelo de ingresos activo</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {comisionActiva && (
-                        <p className="text-lg font-bold text-white">
-                          ✓ Comisión del {porcentajeComision}%
-                        </p>
-                      )}
-                      {suscripcionActiva && montoSuscripcion && (
-                        <p className="text-lg font-bold text-white">
-                          ✓ Suscripción de ${Number(montoSuscripcion).toLocaleString('es-AR')}/{frecuenciaSuscripcion}
-                        </p>
-                      )}
-                      {comisionActiva && suscripcionActiva && montoSuscripcion && (
-                        <p className="text-sm text-blue-400 mt-2">
-                          Modelo híbrido: Suscripción de ${Number(montoSuscripcion).toLocaleString('es-AR')}/{frecuenciaSuscripcion} + Comisión del {porcentajeComision}%
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Botón Aplicar Cambios */}
-              <button
-                onClick={handleAplicarCambios}
-                disabled={guardando}
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold py-4 px-6 rounded-xl transition-all shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
-              >
-                {guardando ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    Guardando...
-                  </>
-                ) : (
-                  <>
-                    <Save size={20} />
-                    Aplicar Cambios
-                  </>
-                )}
-              </button>
+            {/* ── KPIs Top ── */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <KpiCard
+                icon={<Car size={20} />} color="cyan"
+                label="Ingresos Hoy" value={fmtARS(fin?.gross_revenue)}
+                sub={fin ? `${fmtNum(fin.trips_count)} viajes` : undefined}
+              />
+              <KpiCard
+                icon={<TrendingUp size={20} />} color="success"
+                label="Neto Hoy" value={fmtARS(fin?.net_revenue)}
+              />
+              <KpiCard
+                icon={<DollarSign size={20} />} color="gold"
+                label="Neto Mes" value={fmtARS(mfin?.net_revenue)}
+                sub={mfin ? `${fmtNum(mfin.trips_count)} viajes · ${mfin.days_with_data} días` : undefined}
+              />
+              <KpiCard
+                icon={<Users size={20} />} color="slate"
+                label="Conductores Online"
+                value={fmtNum(ops?.conductoresOnline)}
+                sub={ops ? `${fmtNum(ops?.pasajerosBuscando)} buscando viaje` : undefined}
+              />
             </div>
 
-            {/* Mapa de Calor Provisorio */}
-            <div className="bg-zinc-900 border-2 border-blue-500/30 rounded-2xl p-8 shadow-2xl shadow-blue-500/10">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="bg-blue-500/10 p-3 rounded-xl">
-                  <MapPin className="text-blue-400" size={28} />
+            {/* ── Gráfico de tendencia ── */}
+            <Section title="Tendencia de Ingresos — Últimos 30 días">
+              {trendData.length > 0 ? (
+                <div className="h-72 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={trendData}>
+                      <defs>
+                        <linearGradient id="colorNeto" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor={COLORS.cyan} stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor={COLORS.cyan} stopOpacity={0}/>
+                        </linearGradient>
+                        <linearGradient id="colorBruto" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor={COLORS.gold} stopOpacity={0.2}/>
+                          <stop offset="95%" stopColor={COLORS.gold} stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#33415520" />
+                      <XAxis dataKey="fecha" tick={{ fontSize: 11, fill: COLORS.stone }} />
+                      <YAxis tick={{ fontSize: 11, fill: COLORS.stone }} />
+                      <Tooltip
+                        contentStyle={{
+                          background: COLORS.deep, border: "1px solid #33415540",
+                          borderRadius: 12, color: "#fff", fontSize: 13,
+                        }}
+                        formatter={(value: number) => [fmtARS(value), ""]}
+                      />
+                      <Area type="monotone" dataKey="ingresos" stroke={COLORS.gold}
+                        fill="url(#colorBruto)" strokeWidth={2} name="Bruto" />
+                      <Area type="monotone" dataKey="neto" stroke={COLORS.cyan}
+                        fill="url(#colorNeto)" strokeWidth={2} name="Neto" />
+                    </AreaChart>
+                  </ResponsiveContainer>
                 </div>
-                <div>
-                  <h2 className="text-2xl font-bold">Mapa de Calor: Demanda vs Oferta</h2>
-                  <p className="text-zinc-400 text-sm">Visualización de zonas con mayor actividad</p>
-                </div>
-              </div>
+              ) : (
+                <EmptyChart text="Sin datos de ingresos aún" />
+              )}
+            </Section>
 
-              {/* Placeholder Visual */}
-              <div className="relative bg-zinc-950 border-2 border-dashed border-zinc-800 rounded-xl p-12 min-h-[400px] flex items-center justify-center overflow-hidden">
-                {/* Efecto de gradiente de fondo */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-red-500/5"></div>
-                
-                {/* Grid de puntos simulando mapa */}
-                <div className="absolute inset-0 opacity-20">
-                  {[...Array(8)].map((_, i) => (
-                    <div key={i} className="flex justify-around py-8">
-                      {[...Array(12)].map((_, j) => (
-                        <div 
-                          key={j} 
-                          className={`w-3 h-3 rounded-full ${
-                            Math.random() > 0.7 ? 'bg-red-500' : 
-                            Math.random() > 0.5 ? 'bg-orange-500' : 
-                            Math.random() > 0.3 ? 'bg-yellow-500' : 'bg-blue-500'
-                          }`}
-                          style={{ opacity: Math.random() * 0.8 + 0.2 }}
-                        ></div>
+            {/* ── Gráfico de viajes diarios ── */}
+            <Section title="Viajes por Día — Última semana">
+              {dailyRange.data && dailyRange.data.length > 0 ? (
+                <div className="h-56 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={dailyRange.data.map(d => ({
+                      fecha: d.date_bucket.slice(5),
+                      viajes: d.trips_count,
+                      marketing: d.marketing_spend,
+                    }))}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#33415520" />
+                      <XAxis dataKey="fecha" tick={{ fontSize: 11, fill: COLORS.stone }} />
+                      <YAxis tick={{ fontSize: 11, fill: COLORS.stone }} />
+                      <Tooltip
+                        contentStyle={{
+                          background: COLORS.deep, border: "1px solid #33415540",
+                          borderRadius: 12, color: "#fff", fontSize: 13,
+                        }}
+                      />
+                      <Line type="monotone" dataKey="viajes" stroke={COLORS.gold}
+                        strokeWidth={2.5} dot={{ r: 4, fill: COLORS.gold }} name="Viajes" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <EmptyChart text="Sin datos de viajes" />
+              )}
+            </Section>
+
+            {/* ── Operaciones + Breakdown ── */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Panel de operaciones */}
+              <Section title="Operaciones en Vivo">
+                <div className="space-y-3">
+                  <OpRow icon={<Headphones size={16} />} color="cyan"
+                    label="Soporte activos" value={fmtNum(ops?.soporteActivos)} />
+                  <OpRow icon={<AlertCircle size={16} />} color="error"
+                    label="Soporte urgentes" value={fmtNum(ops?.soporteUrgentes)} />
+                  <OpRow icon={<FileWarning size={16} />} color="gold"
+                    label="Docs pendientes" value={fmtNum(ops?.documentosPendientes)} />
+                  <OpRow icon={<AlertCircle size={16} />} color="error"
+                    label="Pánico abiertos" value={String(ops?.panicoAbiertos?.length ?? 0)} />
+                  {ops?.panicoAbiertos && ops.panicoAbiertos.length > 0 && (
+                    <div className="mt-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20">
+                      {ops.panicoAbiertos.map(p => (
+                        <div key={p.id} className="text-xs text-rutmy-error flex items-center gap-2">
+                          <AlertCircle size={12} />
+                          #{p.id} — {p.severity} — {p.description ?? "Sin descripción"}
+                        </div>
                       ))}
                     </div>
-                  ))}
+                  )}
                 </div>
+              </Section>
 
-                {/* Contenido central */}
-                <div className="relative text-center z-10">
-                  <div className="w-20 h-20 bg-blue-500/20 border-2 border-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <MapPin className="text-blue-400" size={40} />
+              {/* Breakdown por método de pago */}
+              <Section title="Ingresos por Método de Pago (Mes)">
+                {paymentData.length > 0 ? (
+                  <div className="h-52 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie data={paymentData} cx="50%" cy="50%"
+                          innerRadius={50} outerRadius={80}
+                          paddingAngle={4} dataKey="value"
+                          label={({ name, percent }) =>
+                            `${name} ${(percent * 100).toFixed(0)}%`
+                          }
+                        >
+                          {paymentData.map((_, i) => (
+                            <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          contentStyle={{
+                            background: COLORS.deep, border: "1px solid #33415540",
+                            borderRadius: 12, color: "#fff",
+                          }}
+                          formatter={(value: number) => [fmtARS(value), ""]}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
                   </div>
-                  <h3 className="text-xl font-bold mb-2">Mapa de Calor en Desarrollo</h3>
-                  <p className="text-zinc-500 max-w-md">
-                    Esta sección mostrará en tiempo real las zonas con mayor demanda de viajes y disponibilidad de conductores
-                  </p>
-                  <div className="flex items-center justify-center gap-6 mt-6">
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-red-500 rounded-full"></div>
-                      <span className="text-xs text-zinc-400">Alta demanda</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-yellow-500 rounded-full"></div>
-                      <span className="text-xs text-zinc-400">Media</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
-                      <span className="text-xs text-zinc-400">Baja</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                ) : (
+                  <EmptyChart text="Sin datos de breakdown" />
+                )}
+              </Section>
             </div>
           </div>
+        ) : (
+          /* ── Tab Configuración ── */
+          <div className="max-w-lg space-y-6">
+            <Section title="Configuración de Comisión Scertta">
+              <form onSubmit={handleSubmit(onSaveCommission)} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-rutmy-slate dark:text-white/80 mb-1.5">
+                    Comisión Scertta (%)
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number" step="0.1"
+                      {...register("comision_pct", { valueAsNumber: true })}
+                      className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-2.5 text-sm outline-none focus:border-rutmy-agua focus:ring-1 focus:ring-rutmy-agua transition"
+                    />
+                    <Percent size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-rutmy-stone" />
+                  </div>
+                  {errors.comision_pct && (
+                    <p className="text-xs text-rutmy-error mt-1">{errors.comision_pct.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-rutmy-slate dark:text-white/80 mb-1.5">
+                    Gastos Operativos (%)
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number" step="0.1"
+                      {...register("gastos_operativos_pct", { valueAsNumber: true })}
+                      className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-2.5 text-sm outline-none focus:border-rutmy-agua focus:ring-1 focus:ring-rutmy-agua transition"
+                    />
+                    <Percent size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-rutmy-stone" />
+                  </div>
+                  {errors.gastos_operativos_pct && (
+                    <p className="text-xs text-rutmy-error mt-1">{errors.gastos_operativos_pct.message}</p>
+                  )}
+                </div>
+
+                {/* Preview del cálculo */}
+                <div className="bg-rutmy-deep dark:bg-white/5 rounded-xl p-4 text-sm space-y-1.5">
+                  <p className="text-white/60 text-xs font-semibold uppercase tracking-wide">Vista Previa</p>
+                  <p className="text-white/80">
+                    Comisión: <span className="text-rutmy-agua font-bold">
+                      {fmtARS((fin?.gross_revenue ?? 0) * (commission.data?.comision_scertta_pct ?? 15) / 100)}
+                    </span> del bruto hoy ({fmtARS(fin?.gross_revenue)})
+                  </p>
+                  <p className="text-white/60 text-xs">
+                    Neto franquicia = bruto − comisión − gastos operativos − impuestos
+                  </p>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-3 rounded-xl font-bold text-sm bg-rutmy-agua text-rutmy-deep hover:bg-rutmy-agua/90 disabled:opacity-50 transition flex items-center justify-center gap-2"
+                >
+                  {isSubmitting ? (
+                    <RefreshCw size={18} className="animate-spin" />
+                  ) : (
+                    <CheckCircle2 size={18} />
+                  )}
+                  {isSubmitting ? "Guardando…" : "Guardar Configuración"}
+                </button>
+              </form>
+            </Section>
+          </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+// ── Componentes internos ──
+
+function KpiCard({ icon, color, label, value, sub }: {
+  icon: React.ReactNode; color: "cyan" | "gold" | "success" | "slate";
+  label: string; value: string; sub?: string;
+}) {
+  const colorMap = {
+    cyan: "bg-rutmy-agua/10 text-rutmy-agua border-rutmy-agua/20",
+    gold: "bg-rutmy-agua/10 text-rutmy-agua border-rutmy-agua/20",
+    success: "bg-rutmy-success/10 text-rutmy-success border-rutmy-success/20",
+    slate: "bg-rutmy-slate/10 text-rutmy-slate dark:text-white/60 border-rutmy-slate/20",
+  };
+  return (
+    <div className="rounded-2xl border border-black/5 dark:border-white/10 bg-white dark:bg-white/5 p-4 sm:p-5 hover:shadow-sm transition">
+      <div className={`h-10 w-10 rounded-xl flex items-center justify-center mb-3 border ${colorMap[color]}`}>
+        {icon}
+      </div>
+      <p className="text-xs text-rutmy-stone font-medium">{label}</p>
+      <p className="text-xl sm:text-2xl font-bold text-rutmy-deep dark:text-white mt-0.5">{value}</p>
+      {sub && <p className="text-[11px] text-rutmy-stone mt-1">{sub}</p>}
+    </div>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-2xl border border-black/5 dark:border-white/10 bg-white dark:bg-white/5 p-4 sm:p-5">
+      <h3 className="text-sm font-bold text-rutmy-slate dark:text-white/80 mb-4">{title}</h3>
+      {children}
+    </div>
+  );
+}
+
+function OpRow({ icon, color, label, value }: {
+  icon: React.ReactNode; color: string; label: string; value: string;
+}) {
+  return (
+    <div className="flex items-center justify-between py-2 border-b border-black/5 dark:border-white/5 last:border-0">
+      <div className="flex items-center gap-2 text-sm text-rutmy-slate dark:text-white/70">
+        <span className={`text-rutmy-${color}`}>{icon}</span>
+        {label}
+      </div>
+      <span className="font-bold text-sm text-rutmy-deep dark:text-white">{value}</span>
+    </div>
+  );
+}
+
+function EmptyChart({ text }: { text: string }) {
+  return (
+    <div className="h-48 flex items-center justify-center text-rutmy-stone text-sm">
+      <div className="text-center">
+        <BarChart3 size={32} className="mx-auto mb-2 opacity-30" />
+        {text}
       </div>
     </div>
   );

@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scertta FASE 3 — Blueprint Visual · Portal Multi-Destino</title>
+<style>
+  :root {
+    --deep: #0F172A;
+    --mint: #64DEB2;
+    --cyan: #0891B2;
+    --gold: #D4A017;
+    --slate: #334155;
+    --stone: #78716C;
+    --sand: #FAFAF5;
+    --white: #FFFFFF;
+    --red: #DC2626;
+    --orange: #F97316;
+    --green: #059669;
+    --amber: #D97706;
+    --radius: 10px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.25);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #0a0f1a;
+    color: #e2e8f0;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  
+  /* ── TOP BAR ── */
+  .topbar {
+    background: var(--deep);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 14px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .topbar .logo { font-weight: 800; font-size: 1.2rem; letter-spacing: -0.5px; }
+  .topbar .logo .scertta { color: var(--gold); }
+  .topbar .logo .rutmy { color: var(--mint); }
+  .topbar .logo .sep { color: var(--stone); margin: 0 4px; }
+  
+  /* ── TAB NAV ── */
+  .tabnav {
+    display: flex; gap: 4px;
+    background: rgba(255,255,255,0.03);
+    border-radius: var(--radius);
+    padding: 4px;
+  }
+  .tabnav button {
+    background: none; border: none; color: var(--stone);
+    padding: 8px 16px; border-radius: 7px; cursor: pointer;
+    font-size: 0.85rem; font-weight: 600;
+    transition: all 0.2s;
+  }
+  .tabnav button:hover { color: #cbd5e1; background: rgba(255,255,255,0.05); }
+  .tabnav button.active {
+    background: rgba(100,222,178,0.15);
+    color: var(--mint);
+  }
+  
+  /* ── MAIN CONTENT ── */
+  .main { max-width: 1400px; margin: 0 auto; padding: 32px 28px; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+  
+  .section-title {
+    font-size: 1.1rem; font-weight: 700; color: var(--white);
+    margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+  }
+  .section-title .badge {
+    font-size: 0.7rem; background: rgba(100,222,178,0.15); color: var(--mint);
+    padding: 3px 10px; border-radius: 20px; font-weight: 600;
+  }
+  
+  /* ── CARDS ── */
+  .card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .card-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px; padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .card-header h3 { font-size: 0.9rem; font-weight: 700; color: #cbd5e1; }
+  
+  /* ── GRIDS ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; }
+  .grid-1-2 { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
+  .grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+  
+  /* ── KPI ── */
+  .kpi { text-align: center; padding: 16px 12px; }
+  .kpi .value { font-size: 1.8rem; font-weight: 800; color: var(--white); }
+  .kpi .label { font-size: 0.75rem; color: var(--stone); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .kpi.warn .value { color: var(--orange); }
+  .kpi.good .value { color: var(--green); }
+  .kpi.gold .value { color: var(--gold); }
+  
+  /* ── TABLE ── */
+  .mini-table { width: 100%; font-size: 0.8rem; border-collapse: collapse; }
+  .mini-table th { text-align: left; color: var(--stone); font-weight: 600; padding: 8px 6px; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  .mini-table td { padding: 8px 6px; border-bottom: 1px solid rgba(255,255,255,0.03); color: #cbd5e1; }
+  .mini-table tr:hover td { background: rgba(255,255,255,0.02); }
+  
+  /* ── STATUS PILLS ── */
+  .pill {
+    display: inline-block; padding: 2px 10px; border-radius: 20px;
+    font-size: 0.7rem; font-weight: 700;
+  }
+  .pill.green { background: rgba(5,150,105,0.2); color: var(--green); }
+  .pill.amber { background: rgba(217,119,6,0.2); color: var(--amber); }
+  .pill.red { background: rgba(220,38,38,0.2); color: var(--red); }
+  .pill.cyan { background: rgba(8,145,178,0.2); color: var(--cyan); }
+  .pill.gold { background: rgba(212,160,23,0.2); color: var(--gold); }
+  
+  /* ── PROGRESS ── */
+  .progress-bar {
+    height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px;
+    overflow: hidden; margin-top: 6px;
+  }
+  .progress-bar .fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+  .fill.green { background: var(--green); }
+  .fill.gold { background: var(--gold); }
+  .fill.red { background: var(--red); }
+  
+  /* ── ALERT BANNER ── */
+  .alert-banner {
+    background: rgba(220,38,38,0.1); border-left: 3px solid var(--red);
+    padding: 12px 16px; border-radius: 0 var(--radius) var(--radius) 0;
+    margin-bottom: 16px; font-size: 0.85rem;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .alert-banner .icon { font-size: 1.2rem; }
+  
+  /* ── MAP MOCK ── */
+  .map-mock {
+    background: linear-gradient(135deg, #0F172A 0%, #1a2744 50%, #0F172A 100%);
+    border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.08);
+    position: relative; overflow: hidden;
+    min-height: 400px;
+  }
+  .map-mock .map-overlay {
+    position: absolute; inset: 0;
+    background: 
+      radial-gradient(circle at 30% 40%, rgba(212,160,23,0.08) 0%, transparent 40%),
+      radial-gradient(circle at 65% 55%, rgba(100,222,178,0.06) 0%, transparent 30%),
+      radial-gradient(circle at 45% 60%, rgba(8,145,178,0.05) 0%, transparent 25%);
+  }
+  .map-mock .map-grid {
+    position: absolute; inset: 0;
+    background-image: 
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  .map-roads { position: absolute; inset: 0; }
+  .map-roads svg { width: 100%; height: 100%; }
+  
+  .map-marker {
+    position: absolute; width: 12px; height: 12px; border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 12px currentColor;
+  }
+  .map-marker.driver { background: var(--mint); color: var(--mint); }
+  .map-marker.poi { background: var(--gold); color: var(--gold); width: 8px; height: 8px; }
+  .map-marker.closure { background: var(--red); color: var(--red); width: 6px; height: 6px; border-radius: 2px; }
+  .map-marker.incident { background: var(--orange); color: var(--orange); animation: pulse 1.5s infinite; }
+  .map-marker.radar { background: #7C3AED; color: #7C3AED; width: 10px; height: 10px; }
+  .map-marker.police { background: #3B82F6; color: #3B82F6; width: 10px; height: 10px; }
+  
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 8px currentColor; }
+    50% { box-shadow: 0 0 20px currentColor, 0 0 30px currentColor; }
+  }
+  
+  .map-legend {
+    position: absolute; bottom: 12px; left: 12px;
+    background: rgba(15,23,42,0.9); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius); padding: 10px 14px; font-size: 0.7rem;
+    display: flex; flex-direction: column; gap: 4px;
+    backdrop-filter: blur(8px);
+  }
+  .map-legend-item { display: flex; align-items: center; gap: 6px; }
+  .map-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  
+  /* ── WORKFLOW STEPS ── */
+  .workflow {
+    display: flex; gap: 0; align-items: flex-start;
+    padding: 16px 0;
+  }
+  .workflow-step {
+    flex: 1; text-align: center; position: relative;
+    padding: 0 12px;
+  }
+  .workflow-step::after {
+    content: "→"; position: absolute; right: -8px; top: 14px;
+    color: var(--stone); font-size: 1.2rem;
+  }
+  .workflow-step:last-child::after { display: none; }
+  .workflow-step .step-num {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(100,222,178,0.15); color: var(--mint);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 8px; font-weight: 800; font-size: 0.85rem;
+  }
+  .workflow-step .step-label { font-size: 0.75rem; color: #cbd5e1; font-weight: 600; }
+  .workflow-step .step-desc { font-size: 0.65rem; color: var(--stone); margin-top: 4px; }
+  
+  /* ── VALUE SLIDER ── */
+  .value-control {
+    display: flex; align-items: center; gap: 16px; padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .value-control .vc-label { font-weight: 700; font-size: 0.85rem; min-width: 180px; }
+  .value-control .vc-current {
+    font-size: 1.4rem; font-weight: 800; min-width: 60px; text-align: center;
+  }
+  .value-control .vc-current.gold-text { color: var(--gold); }
+  .value-control .vc-current.mint-text { color: var(--mint); }
+  .value-control .vc-slider {
+    flex: 1; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px;
+    position: relative;
+  }
+  .value-control .vc-fill {
+    height: 100%; border-radius: 3px; position: absolute;
+  }
+  .value-control .vc-thumb {
+    width: 18px; height: 18px; border-radius: 50%; position: absolute;
+    top: 50%; transform: translate(-50%, -50%);
+    border: 2px solid var(--deep); cursor: pointer;
+  }
+  
+  /* ── ANNOTATION CALLOUT ── */
+  .callout {
+    background: rgba(8,145,178,0.08); border-left: 3px solid var(--cyan);
+    padding: 10px 14px; border-radius: 0 var(--radius) var(--radius) 0;
+    margin: 8px 0; font-size: 0.75rem; color: #94a3b8;
+  }
+  .callout strong { color: var(--cyan); }
+  
+  /* ── VOICE ALERT PANEL ── */
+  .voice-panel {
+    background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.2);
+    border-radius: var(--radius); padding: 14px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .voice-panel .vp-icon {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(124,58,237,0.2); color: #A78BFA;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+  }
+  
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .grid-2, .grid-3, .grid-4, .grid-1-2, .grid-2-1 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ TOP BAR ═══════════════ -->
+<div class="topbar">
+  <div class="logo">
+    <span class="scertta">Scertta</span><span class="sep">/</span><span class="rutmy">Rutmy</span>
+    <span style="font-size:0.7rem;color:var(--stone);margin-left:12px;">FASE 3 · Blueprint Visual</span>
+  </div>
+  <div class="tabnav">
+    <button class="active" onclick="switchTab('gerente')">🎛️ Dashboard Gerente</button>
+    <button onclick="switchTab('valores')">⚙️ Valores Regulables</button>
+    <button onclick="switchTab('empresa')">🏢 Portal Rutmy Empresa</button>
+    <button onclick="switchTab('mapa')">🗺️ Mapa Inteligente Chofer</button>
+  </div>
+</div>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<div class="main">
+
+<!-- ━━━━━━━━━━━━━ TAB 1: DASHBOARD GERENTE ━━━━━━━━━━━━━ -->
+<div id="screen-gerente" class="screen active">
+
+  <!-- ── ALERT BANNER ── -->
+  <div class="alert-banner">
+    <span class="icon">⚠️</span>
+    <span><strong>3 documentos por vencer:</strong> VTV (Fiat Cronos · 5 jul), Licencia (Carlos G. · 12 jul), Seguro (Moto Honda · 18 jul)</span>
+    <span style="margin-left:auto;color:var(--stone);font-size:0.7rem;">[Ver todos →]</span>
+  </div>
+
+  <!-- ── KPIs ROW ── -->
+  <div class="grid-4" style="margin-bottom:20px;">
+    <div class="card kpi"><div class="value">247</div><div class="label">Viajes Hoy</div></div>
+    <div class="card kpi good"><div class="value">$45,230</div><div class="label">Facturación Semanal</div></div>
+    <div class="card kpi gold"><div class="value">34</div><div class="label">Choferes Activos</div></div>
+    <div class="card kpi warn"><div class="value">4</div><div class="label">Cierres Sin Pagar</div></div>
+  </div>
+
+  <!-- ── MAPA OPERACIONAL ── -->
+  <div class="section-title">🗺️ Mapa Operacional en Vivo <span class="badge">TIEMPO REAL</span></div>
+  <div class="map-mock" style="height:350px;margin-bottom:20px;">
+    <div class="map-grid"></div>
+    <div class="map-roads">
+      <svg viewBox="0 0 800 350">
+        <!-- Main roads -->
+        <line x1="50" y1="175" x2="750" y2="175" stroke="rgba(212,160,23,0.4)" stroke-width="3"/>
+        <line x1="400" y1="30" x2="400" y2="320" stroke="rgba(212,160,23,0.3)" stroke-width="2"/>
+        <line x1="100" y1="100" x2="650" y2="280" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+        <line x1="200" y1="280" x2="700" y2="80" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+        <!-- Closure: red dashed -->
+        <line x1="380" y1="140" x2="420" y2="210" stroke="#DC2626" stroke-width="3" stroke-dasharray="6,3" opacity="0.8"/>
+      </svg>
+    </div>
+    <div class="map-overlay"></div>
+    <!-- Markers -->
+    <div class="map-marker driver" style="top:35%;left:28%;"></div>
+    <div class="map-marker driver" style="top:48%;left:55%;"></div>
+    <div class="map-marker driver" style="top:62%;left:42%;"></div>
+    <div class="map-marker driver" style="top:30%;left:68%;"></div>
+    <div class="map-marker driver" style="top:55%;left:75%;"></div>
+    <div class="map-marker closure" style="top:47%;left:50%;"></div>
+    <div class="map-marker incident" style="top:38%;left:60%;"></div>
+    <div class="map-marker poi" style="top:42%;left:35%;"></div>
+    <div class="map-marker poi" style="top:58%;left:70%;"></div>
+    <!-- Legend -->
+    <div class="map-legend">
+      <div class="map-legend-item"><span class="map-legend-dot" style="background:var(--mint)"></span> Chofer activo (5)</div>
+      <div class="map-legend-item"><span class="map-legend-dot" style="background:var(--red)"></span> Corte reportado (1)</div>
+      <div class="map-legend-item"><span class="map-legend-dot" style="background:var(--orange)"></span> Incidente (1)</div>
+      <div class="map-legend-item"><span class="map-legend-dot" style="background:var(--gold)"></span> POI verificado (2)</div>
+    </div>
+  </div>
+
+  <!-- ── OCA 4-CAPA FLEET ── -->
+  <div class="section-title">🚛 Flota · 4 Capas OCA <span class="badge">FLEET</span></div>
+  <div class="grid-2" style="margin-bottom:20px;">
+    <!-- Capa 1: Ficha Técnica -->
+    <div class="card">
+      <div class="card-header"><h3>📋 Capa 1 — Ficha Técnica</h3><span class="pill cyan">12 vehículos</span></div>
+      <table class="mini-table">
+        <tr><th>Vehículo</th><th>Tipo</th><th>Patente</th><th>Modelo</th></tr>
+        <tr><td>Fiat Cronos</td><td>Auto</td><td>AE456CD</td><td>2023</td></tr>
+        <tr><td>Moto Honda CB</td><td>Moto</td><td>A789XYZ</td><td>2024</td></tr>
+        <tr><td>Ford Ranger</td><td>Utilitario</td><td>AB123EF</td><td>2022</td></tr>
+        <tr><td>Mercedes Sprinter</td><td>Camión</td><td>AC987GH</td><td>2021</td></tr>
+      </table>
+      <div class="callout"><strong>OCA pattern:</strong> fleet_vehicle_configuration — datos duros, lenta actualización. Sin estado operativo acá.</div>
+    </div>
+    <!-- Capa 2: Estado Operativo -->
+    <div class="card">
+      <div class="card-header"><h3>🟢 Capa 2 — Estado Operativo</h3><span class="pill green">alta frecuencia</span></div>
+      <table class="mini-table">
+        <tr><th>Conductor</th><th>Estado</th><th>Viaje</th><th>Destino</th></tr>
+        <tr><td>Carlos G.</td><td><span class="pill green">En ruta</span></td><td>#1289</td><td>Belgrano</td></tr>
+        <tr><td>María L.</td><td><span class="pill green">En ruta</span></td><td>#1290</td><td>Microcentro</td></tr>
+        <tr><td>Juan P.</td><td><span class="pill amber">Disponible</span></td><td>—</td><td>—</td></tr>
+        <tr><td>Pedro S.</td><td><span class="pill red">Inactivo</span></td><td>—</td><td>—</td></tr>
+      </table>
+      <div class="callout"><strong>OCA pattern:</strong> fleet_vehicle_history_date_end — versionado de estados con timestamp. Datos de alta frecuencia, no se mezclan con ficha técnica.</div>
+    </div>
+    <!-- Capa 3: Documentación -->
+    <div class="card">
+      <div class="card-header"><h3>📄 Capa 3 — Documentación</h3><span class="pill amber">3 por vencer</span></div>
+      <table class="mini-table">
+        <tr><th>Documento</th><th>Vehículo</th><th>Vence</th><th>Estado</th></tr>
+        <tr><td>VTV</td><td>Fiat Cronos</td><td>5 jul 2026</td><td><span class="pill amber">12 días</span></td></tr>
+        <tr><td>Licencia</td><td>Carlos G.</td><td>12 jul 2026</td><td><span class="pill amber">19 días</span></td></tr>
+        <tr><td>Seguro</td><td>Moto Honda</td><td>18 jul 2026</td><td><span class="pill amber">25 días</span></td></tr>
+        <tr><td>Cédula Verde</td><td>Ford Ranger</td><td>3 dic 2026</td><td><span class="pill green">Al día</span></td></tr>
+      </table>
+      <div class="callout"><strong>OCA pattern:</strong> fleet_vehicle_inspection — estados draft→confirmed→passed/failed. Alertas visuales cuando vence en <30 días.</div>
+    </div>
+    <!-- Capa 4: Costos -->
+    <div class="card">
+      <div class="card-header"><h3>💰 Capa 4 — Costos Operativos</h3><span class="pill gold">semana 24</span></div>
+      <table class="mini-table">
+        <tr><th>Categoría</th><th>Monto</th><th>% del total</th></tr>
+        <tr><td>Combustible</td><td>$18,500</td><td>42%</td></tr>
+        <tr><td>Mantenimiento</td><td>$8,200</td><td>19%</td></tr>
+        <tr><td>Peajes</td><td>$5,100</td><td>12%</td></tr>
+        <tr><td>Seguros</td><td>$12,300</td><td>28%</td></tr>
+      </table>
+      <div class="callout"><strong>OCA pattern:</strong> fleet_vehicle_log_fuel + fleet_vehicle_log_services — tracking acumulativo por período.</div>
+    </div>
+  </div>
+
+  <!-- ── TABLERO DE DESPACHO ── -->
+  <div class="section-title">📦 Tablero de Despacho <span class="badge">STOCK-LOGISTICS</span></div>
+  <div class="grid-1-2" style="margin-bottom:20px;">
+    <!-- Cola de asignación -->
+    <div class="card">
+      <div class="card-header"><h3>Cola de Asignación</h3><span class="pill amber">3 pendientes</span></div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="background:rgba(100,222,178,0.06);padding:10px 12px;border-radius:8px;border-left:3px solid var(--mint);">
+          <div style="font-weight:700;font-size:0.8rem;color:var(--mint);">🟢 Viaje #1291 — Motomensajería</div>
+          <div style="font-size:0.7rem;color:var(--stone);">Palermo → Microcentro · Hace 3 min</div>
+          <div style="margin-top:6px;"><span class="pill cyan" style="cursor:pointer">Asignar conductor</span></div>
+        </div>
+        <div style="background:rgba(212,160,23,0.06);padding:10px 12px;border-radius:8px;border-left:3px solid var(--gold);">
+          <div style="font-weight:700;font-size:0.8rem;color:var(--gold);">🟡 Viaje #1292 — Auto (carga ligera)</div>
+          <div style="font-size:0.7rem;color:var(--stone);">Retiro → Ezeiza · Hace 8 min · Sin conductor <2km</div>
+          <div style="margin-top:6px;display:flex;gap:6px;">
+            <span class="pill cyan" style="cursor:pointer">Buscar</span>
+            <span class="pill gold" style="cursor:pointer">Lanzar oferta</span>
+          </div>
+        </div>
+        <div style="background:rgba(220,38,38,0.06);padding:10px 12px;border-radius:8px;border-left:3px solid var(--red);">
+          <div style="font-weight:700;font-size:0.8rem;color:var(--red);">🔴 Viaje #1293 — Carga pesada</div>
+          <div style="font-size:0.7rem;color:var(--stone);">Avellaneda → Tigre · Hace 15 min · Requiere camión</div>
+          <div style="margin-top:6px;"><span class="pill red" style="cursor:pointer">Publicar licitación</span></div>
+        </div>
+      </div>
+      <div class="callout"><strong>OCA pattern:</strong> stock_picking_batch — agrupar entregas. Colores por urgencia: verde (<5min), amarillo (<15min), rojo (>15min).</div>
+    </div>
+    <!-- Conductores en ruta -->
+    <div class="card">
+      <div class="card-header"><h3>Conductores en Ruta</h3><span class="pill green">5 activos</span></div>
+      <table class="mini-table">
+        <tr><th>Conductor</th><th>Viaje</th><th>Ruta</th><th>ETA</th></tr>
+        <tr><td>🏍️ Carlos G.</td><td>#1289</td><td>Caballito → Belgrano</td><td>12 min</td></tr>
+        <tr><td>🚗 María L.</td><td>#1290</td><td>San Telmo → Microcentro</td><td>8 min</td></tr>
+        <tr><td>🏍️ Diego R.</td><td>#1287</td><td>Palermo → Recoleta</td><td>5 min</td></tr>
+        <tr><td>🚛 Roberto A.</td><td>#1285</td><td>Pilar → Escobar</td><td>22 min</td></tr>
+        <tr><td>🚗 Ana M.</td><td>#1288</td><td>Liniers → Floresta</td><td>4 min</td></tr>
+      </table>
+      <div style="margin-top:10px;background:rgba(8,145,178,0.08);padding:8px 12px;border-radius:8px;font-size:0.7rem;color:var(--cyan);">
+        💡 <strong>Próximo disponible:</strong> Diego R. en ~5 min (Recoleta). Puede tomar #1291 (cercanía 1.2km).
+      </div>
+      <div class="callout"><strong>OCA pattern:</strong> delivery_carrier — matching automático por cercanía geográfica + tipo de vehículo.</div>
+    </div>
+  </div>
+
+  <!-- ── CONCILIACIÓN ARCA 3 PASOS ── -->
+  <div class="section-title">🏦 Conciliación Financiera · Flujo ARCA <span class="badge">ACCOUNT-PAYMENT</span></div>
+  <div class="card" style="margin-bottom:20px;">
+    <!-- Workflow visual -->
+    <div class="workflow">
+      <div class="workflow-step">
+        <div class="step-num">1</div>
+        <div class="step-label">Comprobante Interno</div>
+        <div class="step-desc">Se genera al cerrar<br>el período semanal</div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">2</div>
+        <div class="step-label">Pago Confirmado</div>
+        <div class="step-desc">Webhook Transferencia 3.0<br>o conciliación manual</div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">3</div>
+        <div class="step-label">Factura ARCA</div>
+        <div class="step-desc">Se gatilla automático<br>SOLO post-pago</div>
+      </div>
+    </div>
+    
+    <!-- Cierres por estado -->
+    <div class="grid-3" style="margin-top:16px;">
+      <div>
+        <div style="font-weight:700;font-size:0.8rem;color:var(--amber);margin-bottom:8px;">📋 Pendientes (4)</div>
+        <table class="mini-table">
+          <tr><td>Sem 24 — Flota Abierta</td><td style="color:var(--gold);">$14,500</td></tr>
+          <tr><td>Sem 24 — B2B Logística</td><td style="color:var(--gold);">$8,200</td></tr>
+          <tr><td>Sem 23 — Flota Abierta</td><td style="color:var(--red);">$3,100 ⚠️</td></tr>
+        </table>
+      </div>
+      <div>
+        <div style="font-weight:700;font-size:0.8rem;color:var(--cyan);margin-bottom:8px;">✅ Confirmados (8)</div>
+        <table class="mini-table">
+          <tr><td>Sem 24 — Flota Abierta</td><td style="color:var(--mint);">$12,300</td></tr>
+          <tr><td>Sem 24 — B2B Logística</td><td style="color:var(--mint);">$4,300</td></tr>
+          <tr><td>Sem 24 — Carga Pesada</td><td style="color:var(--mint);">$3,950</td></tr>
+        </table>
+      </div>
+      <div>
+        <div style="font-weight:700;font-size:0.8rem;color:var(--green);margin-bottom:8px;">🧾 Facturados (7)</div>
+        <table class="mini-table">
+          <tr><td>Sem 23 — Flota Abierta</td><td>FA-000040 ✅</td></tr>
+          <tr><td>Sem 23 — B2B Logística</td><td>FA-000041 ✅</td></tr>
+          <tr><td>Sem 22 — Flota Abierta</td><td>FA-000038 ✅</td></tr>
+        </table>
+      </div>
+    </div>
+    
+    <!-- Métricas de cobranza -->
+    <div style="margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);">
+      <div class="grid-4">
+        <div><span style="color:var(--stone);font-size:0.7rem;">Tiempo promedio cobro</span><br><span style="font-weight:800;">1.8 días</span></div>
+        <div><span style="color:var(--stone);font-size:0.7rem;">Tasa de cobrabilidad</span><br><span style="font-weight:800;color:var(--green);">94%</span></div>
+        <div><span style="color:var(--stone);font-size:0.7rem;">Cierres vencidos >48h</span><br><span style="font-weight:800;color:var(--red);">2 ⚠️</span></div>
+        <div><span style="color:var(--stone);font-size:0.7rem;">Facturas ARCA emitidas</span><br><span style="font-weight:800;">42 (junio)</span></div>
+      </div>
+    </div>
+    <div class="callout"><strong>OCA pattern:</strong> account_payment_order + account_bank_statement_import. Los 3 pasos replican exactamente el flujo OCA de payment order → reconciliation → invoice. La factura ARCA NUNCA se emite antes del pago confirmado — evita pasivos fiscales con deudas incobrables.</div>
+  </div>
+
+</div><!-- /screen-gerente -->
+
+
+<!-- ━━━━━━━━━━━━━ TAB 2: VALORES REGULABLES ━━━━━━━━━━━━━ -->
+<div id="screen-valores" class="screen">
+
+  <div class="section-title">⚙️ Panel de Control · Valores Regulables <span class="badge">GERENTE</span></div>
+  
+  <div class="card" style="margin-bottom:20px;">
+    <div class="card-header"><h3>Parámetros de Franquicia — Buenos Aires</h3><span class="pill cyan">Auditoría activa</span></div>
+    
+    <!-- Valor 1: Comisión Flota Abierta -->
+    <div class="value-control">
+      <div class="vc-label">🚗 Comisión Flota Abierta<br><span style="font-size:0.7rem;color:var(--stone);">% sobre ingresos netos del chofer</span></div>
+      <div style="flex:1;">
+        <div class="vc-slider">
+          <div class="vc-fill" style="width:33%;background:var(--gold);"></div>
+          <div class="vc-thumb" style="left:33%;background:var(--gold);"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.6rem;color:var(--stone);margin-top:4px;">
+          <span>5%</span><span>10%</span><span>15%</span><span>20%</span>
+        </div>
+      </div>
+      <div class="vc-current gold-text">10.0%</div>
+    </div>
+    
+    <!-- Valor 2: Costo Infraestructura B2B -->
+    <div class="value-control">
+      <div class="vc-label">🏭 Costo Infraestructura B2B<br><span style="font-size:0.7rem;color:var(--stone);">% cobrado a empresas por uso de API</span></div>
+      <div style="flex:1;">
+        <div class="vc-slider">
+          <div class="vc-fill" style="width:22%;background:var(--cyan);"></div>
+          <div class="vc-thumb" style="left:22%;background:var(--cyan);"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.6rem;color:var(--stone);margin-top:4px;">
+          <span>2%</span><span>4.5%</span><span>7%</span><span>10%</span>
+        </div>
+      </div>
+      <div class="vc-current mint-text">4.5%</div>
+    </div>
+    
+    <!-- Valor 3: Comisión Licitación -->
+    <div class="value-control">
+      <div class="vc-label">📦 Comisión Licitación<br><span style="font-size:0.7rem;color:var(--stone);">% sobre monto total de carga pesada</span></div>
+      <div style="flex:1;">
+        <div class="vc-slider">
+          <div class="vc-fill" style="width:39%;background:var(--mint);"></div>
+          <div class="vc-thumb" style="left:39%;background:var(--mint);"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.6rem;color:var(--stone);margin-top:4px;">
+          <span>3%</span><span>7.9%</span><span>12%</span><span>15%</span>
+        </div>
+      </div>
+      <div class="vc-current mint-text">7.9%</div>
+    </div>
+
+    <div class="callout"><strong>OCA pattern:</strong> Cada cambio queda registrado en <code>franquicia_config_auditoria</code>: quién modificó, valor anterior, valor nuevo, timestamp. El slider tiene límites configurables por CEO (min/max) que el gerente no puede violar.</div>
+  </div>
+
+  <!-- Auditoría -->
+  <div class="card">
+    <div class="card-header"><h3>📜 Historial de Auditoría — Valores Regulables</h3><span class="pill gold">últimos cambios</span></div>
+    <table class="mini-table">
+      <tr><th>Fecha</th><th>Parámetro</th><th>Valor Ant.</th><th>Valor Nuevo</th><th>Modificado por</th></tr>
+      <tr><td>15 jun 2026</td><td>Comisión Flota Abierta</td><td>12.0%</td><td style="color:var(--mint);">10.0%</td><td>gerente.ba@rutmy.com</td></tr>
+      <tr><td>10 jun 2026</td><td>Costo Infraestructura</td><td>5.0%</td><td style="color:var(--mint);">4.5%</td><td>gerente.ba@rutmy.com</td></tr>
+      <tr><td>8 jun 2026</td><td>Comisión Licitación</td><td>9.0%</td><td style="color:var(--mint);">7.9%</td><td>scertta.principal@gmail.com</td></tr>
+      <tr><td>1 jun 2026</td><td>Comisión Flota Abierta</td><td>15.0%</td><td style="color:var(--red);">12.0%</td><td>scertta.principal@gmail.com</td></tr>
+    </table>
+    <div class="callout"><strong>CEO override:</strong> Andres (ceo_admin) puede modificar cualquier valor. El gerente solo puede ajustar dentro del rango autorizado por el CEO. Ambos cambios quedan registrados con trazabilidad completa.</div>
+  </div>
+
+</div><!-- /screen-valores -->
+
+
+<!-- ━━━━━━━━━━━━━ TAB 3: PORTAL RUTMY EMPRESA ━━━━━━━━━━━━━ -->
+<div id="screen-empresa" class="screen">
+
+  <div class="section-title">🏢 Portal Rutmy Empresa <span class="badge">B2B</span></div>
+  
+  <!-- Hero / Onboarding -->
+  <div class="card" style="margin-bottom:20px;background:linear-gradient(135deg,rgba(8,145,178,0.1),rgba(100,222,178,0.05));">
+    <div style="display:flex;align-items:center;gap:24px;">
+      <div style="flex:1;">
+        <h2 style="font-size:1.4rem;font-weight:800;color:var(--white);">Logística Inteligente para tu Flota</h2>
+        <p style="color:var(--stone);margin-top:8px;font-size:0.85rem;">API de ruteo Valhalla · Tracking en tiempo real · Facturación semanal automatizada · Sin costo fijo mensual</p>
+        <div style="display:flex;gap:10px;margin-top:16px;">
+          <span class="pill cyan" style="font-size:0.8rem;padding:8px 16px;cursor:pointer;">🚀 Comenzar Onboarding</span>
+          <span class="pill gold" style="font-size:0.8rem;padding:8px 16px;cursor:pointer;">📞 Hablar con Ventas</span>
+        </div>
+      </div>
+      <div style="flex:1;">
+        <div class="grid-2" style="gap:12px;">
+          <div class="card kpi" style="background:rgba(15,23,42,0.5);"><div class="value" style="font-size:1.4rem;">$0.01</div><div class="label">por consulta API</div></div>
+          <div class="card kpi" style="background:rgba(15,23,42,0.5);"><div class="value" style="font-size:1.4rem;">4.5%</div><div class="label">costo infra</div></div>
+          <div class="card kpi" style="background:rgba(15,23,42,0.5);"><div class="value" style="font-size:1.4rem;">7 días</div><div class="label">liquidación</div></div>
+          <div class="card kpi" style="background:rgba(15,23,42,0.5);"><div class="value" style="font-size:1.4rem;">ARCA</div><div class="label">factura electrónica</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Planes -->
+  <div class="section-title">📊 Planes Disponibles</div>
+  <div class="grid-2" style="margin-bottom:20px;">
+    <div class="card" style="border:2px solid rgba(100,222,178,0.2);">
+      <div class="card-header"><h3>🚀 Plan por Consulta</h3><span class="pill mint" style="background:rgba(100,222,178,0.15);color:var(--mint);">Recomendado</span></div>
+      <div style="font-size:2rem;font-weight:800;color:var(--mint);margin:16px 0;">$0.01 <span style="font-size:0.9rem;color:var(--stone);">/ consulta</span></div>
+      <div style="font-size:0.8rem;color:#cbd5e1;display:flex;flex-direction:column;gap:8px;">
+        <div>✅ Ruteo Valhalla (moto/auto/camión)</div>
+        <div>✅ Tracking GPS en tiempo real</div>
+        <div>✅ Hasta 10,000 consultas/mes</div>
+        <div>✅ Factura ARCA semanal automática</div>
+        <div>✅ Soporte técnico prioritario</div>
+        <div>❌ Sin licitaciones de carga</div>
+      </div>
+      <div style="margin-top:16px;"><span class="pill cyan" style="padding:8px 16px;cursor:pointer;font-size:0.8rem;">Seleccionar Plan</span></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>🏭 Plan Premium Fijo</h3><span class="pill gold">Próximamente</span></div>
+      <div style="font-size:2rem;font-weight:800;color:var(--gold);margin:16px 0;">A consultar <span style="font-size:0.9rem;color:var(--stone);">/ mes</span></div>
+      <div style="font-size:0.8rem;color:#cbd5e1;display:flex;flex-direction:column;gap:8px;">
+        <div>✅ Todo lo del Plan por Consulta</div>
+        <div>✅ Consultas ILIMITADAS</div>
+        <div>✅ Licitaciones de carga pesada</div>
+        <div>✅ Fleet Dashboard dedicado</div>
+        <div>✅ SLA 99.9% uptime</div>
+        <div>✅ Gerente de cuenta asignado</div>
+      </div>
+      <div style="margin-top:16px;"><span class="pill" style="background:rgba(120,113,108,0.15);color:var(--stone);padding:8px 16px;cursor:pointer;font-size:0.8rem;">Lista de espera</span></div>
+    </div>
+  </div>
+
+  <!-- Onboarding flow -->
+  <div class="section-title">📝 Flujo de Onboarding</div>
+  <div class="card">
+    <div class="workflow">
+      <div class="workflow-step">
+        <div class="step-num">1</div>
+        <div class="step-label">Datos Fiscales</div>
+        <div class="step-desc">Razón social, CUIT,<br>condición IVA, CBU</div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">2</div>
+        <div class="step-label">Verificación AFIP</div>
+        <div class="step-desc">Validación automática<br>de CUIT + situación fiscal</div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">3</div>
+        <div class="step-label">API Key</div>
+        <div class="step-desc">Generación de clave<br>de acceso a Valhalla</div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">4</div>
+        <div class="step-label">Primer consulta</div>
+        <div class="step-desc">Test de integración<br>con documentación</div>
+      </div>
+    </div>
+    <div class="callout"><strong>Seguridad fiscal:</strong> El paso 2 valida el CUIT contra AFIP antes de habilitar la cuenta. Sin CUIT válido, no se puede facturar ARCA → se bloquea el onboarding. Esto replica el flujo <code>l10n_ar_partner</code> de OCA.</div>
+  </div>
+
+</div><!-- /screen-empresa -->
+
+
+<!-- ━━━━━━━━━━━━━ TAB 4: MAPA INTELIGENTE CHOFER ━━━━━━━━━━━━━ -->
+<div id="screen-mapa" class="screen">
+
+  <div class="section-title">🗺️ Mapa Inteligente · Chofer Rutmy <span class="badge">WAZE-STYLE</span></div>
+
+  <!-- MAPA PRINCIPAL -->
+  <div class="map-mock" style="height:500px;margin-bottom:20px;">
+    <div class="map-grid"></div>
+    <div class="map-roads">
+      <svg viewBox="0 0 800 500">
+        <!-- Highways (gold) -->
+        <line x1="0" y1="250" x2="800" y2="250" stroke="rgba(212,160,23,0.5)" stroke-width="4"/>
+        <line x1="200" y1="0" x2="200" y2="500" stroke="rgba(212,160,23,0.3)" stroke-width="2"/>
+        <line x1="550" y1="0" x2="550" y2="500" stroke="rgba(212,160,23,0.25)" stroke-width="2"/>
+        <!-- Secondary roads -->
+        <line x1="50" y1="100" x2="350" y2="400" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+        <line x1="400" y1="50" x2="750" y2="380" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+        <line x1="100" y1="400" x2="700" y2="100" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+        <!-- Closure: red dashed -->
+        <line x1="180" y1="230" x2="220" y2="280" stroke="#DC2626" stroke-width="4" stroke-dasharray="8,4" opacity="0.9"/>
+        <!-- Route: green -->
+        <polyline points="80,250 130,240 170,220 200,200 280,210 340,195 400,200" fill="none" stroke="#64DEB2" stroke-width="3" opacity="0.8" stroke-dasharray="2,2"/>
+      </svg>
+    </div>
+    <div class="map-overlay"></div>
+    
+    <!-- Driver position -->
+    <div class="map-marker driver" style="top:50%;left:10%;width:16px;height:16px;box-shadow:0 0 20px var(--mint);"></div>
+    
+    <!-- POIs -->
+    <div class="map-marker poi" style="top:35%;left:25%;"></div>
+    <div class="map-marker poi" style="top:60%;left:45%;"></div>
+    <div class="map-marker poi" style="top:28%;left:65%;"></div>
+    <div class="map-marker poi" style="top:70%;left:75%;"></div>
+    
+    <!-- Closure -->
+    <div class="map-marker closure" style="top:50%;left:25%;"></div>
+    
+    <!-- Incident -->
+    <div class="map-marker incident" style="top:42%;left:50%;"></div>
+    
+    <!-- Radar fijo -->
+    <div class="map-marker radar" style="top:48%;left:35%;"></div>
+    <!-- Radar móvil -->
+    <div class="map-marker radar" style="top:55%;left:70%;animation:pulse 1.5s infinite;"></div>
+    <!-- Control policial -->
+    <div class="map-marker police" style="top:30%;left:80%;animation:pulse 2s infinite;"></div>
+    
+    <!-- Legend -->
+    <div class="map-legend">
+      <div class="map-legend-item"><span class="map-legend-dot" style="background:var(--mint)"></span> Mi posición</div>
+      <div class="map-legend-item"><span class="map-legend-dot" style="background:var(--gold)"></span> POI verificado</div>
+      <div class="map-legend-item"><span class="map-legend-dot" style="background:var(--red)"></span> Corte activo</div>
+      <div class="map-legend-item"><span class="map-legend-dot" style="background:var(--orange)"></span> Accidente</div>
+      <div class="map-legend-item"><span class="map-legend-dot" style="background:#7C3AED"></span> Radar fijo / móvil</div>
+      <div class="map-legend-item"><span class="map-legend-dot" style="background:#3B82F6"></span> Control policial</div>
+    </div>
+    
+    <!-- Report buttons overlay -->
+    <div style="position:absolute;right:12px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:6px;">
+      <div class="pill" style="background:#DC2626;color:white;cursor:pointer;padding:8px 10px;font-size:0.7rem;">🚧 Corte</div>
+      <div class="pill" style="background:#F97316;color:white;cursor:pointer;padding:8px 10px;font-size:0.7rem;">💥 Accidente</div>
+      <div class="pill" style="background:#7C3AED;color:white;cursor:pointer;padding:8px 10px;font-size:0.7rem;">📡 Radar</div>
+      <div class="pill" style="background:#3B82F6;color:white;cursor:pointer;padding:8px 10px;font-size:0.7rem;">👮 Policía</div>
+      <div class="pill" style="background:var(--gold);color:var(--deep);cursor:pointer;padding:8px 10px;font-size:0.7rem;">📍 POI</div>
+    </div>
+    
+    <!-- ETA bar (bottom) -->
+    <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(15,23,42,0.95);border-top:1px solid rgba(255,255,255,0.1);padding:12px 16px;display:flex;align-items:center;gap:16px;backdrop-filter:blur(10px);">
+      <div style="font-weight:800;color:var(--mint);font-size:1.2rem;">18 min</div>
+      <div style="flex:1;font-size:0.8rem;color:#cbd5e1;">Belgrano 1420 · CABA</div>
+      <div style="font-size:0.7rem;color:var(--stone);">8.4 km · Evitando 1 corte</div>
+    </div>
+  </div>
+
+  <!-- CAPAS COMUNITARIAS + VOZ -->
+  <div class="grid-2" style="margin-bottom:20px;">
+    <!-- Sistema de reporte comunitario -->
+    <div class="card">
+      <div class="card-header"><h3>👥 Sistema de Reputación Comunitaria</h3><span class="pill mint">3 y 5 upvotes</span></div>
+      <table class="mini-table" style="margin-bottom:12px;">
+        <tr><th>Tipo</th><th>Umbral</th><th>Efecto</th></tr>
+        <tr><td>POI</td><td style="color:var(--gold);">5 upvotes</td><td>pendiente → verificado (aparece en mapa)</td></tr>
+        <tr><td>Corte</td><td style="color:var(--cyan);">3 upvotes</td><td>pendiente → activo (evita en ruta)</td></tr>
+        <tr><td>Incidente</td><td style="color:var(--mint);">1 upvote</td><td>visible inmediatamente (efímero 4h)</td></tr>
+        <tr><td>Radar/Control</td><td style="color:#7C3AED;">3 upvotes</td><td>visible (alerta voz si <2km)</td></tr>
+      </table>
+      <div class="callout"><strong>Anti-abuso:</strong> Rate limit por usuario (10 reportes/h, 50 votos/h). Geofence 500m. >3 rechazos en 24h = cooldown 6h. Trusted (>10 verificados) → auto-aprobación de POIs e incidentes.</div>
+    </div>
+    
+    <!-- Alertas de Voz -->
+    <div class="card">
+      <div class="card-header"><h3>🔊 Alertas de Voz · Radares / Cámaras / Policía</h3><span class="pill" style="background:rgba(124,58,237,0.15);color:#A78BFA;">TTS</span></div>
+      
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="voice-panel">
+          <div class="vp-icon">📡</div>
+          <div>
+            <div style="font-weight:700;font-size:0.85rem;">Radar Fijo · Av. Libertador 5400</div>
+            <div style="font-size:0.7rem;color:var(--stone);">A 1.8 km · Voz: <em>"Radar fijo en 2 kilómetros. Velocidad máxima 60."</em></div>
+          </div>
+          <span class="pill" style="background:rgba(124,58,237,0.2);color:#A78BFA;margin-left:auto;">Verificado</span>
+        </div>
+        
+        <div class="voice-panel">
+          <div class="vp-icon">🚔</div>
+          <div>
+            <div style="font-weight:700;font-size:0.85rem;">Control Policial · Gral. Paz km 12</div>
+            <div style="font-size:0.7rem;color:var(--stone);">A 3.2 km · Reportado hace 25 min · 4 confirmaciones</div>
+          </div>
+          <span class="pill amber">Activo</span>
+        </div>
+        
+        <div class="voice-panel">
+          <div class="vp-icon">📷</div>
+          <div>
+            <div style="font-weight:700;font-size:0.85rem;">Cámara de Semáforo · Av. Santa Fe y Pueyrredón</div>
+            <div style="font-size:0.7rem;color:var(--stone);">A 4.5 km · Voz: <em>"Cámara de semáforo en 4 kilómetros."</em></div>
+          </div>
+          <span class="pill cyan">Fija</span>
+        </div>
+      </div>
+      
+      <div class="callout" style="margin-top:12px;">
+        <strong>Implementación TTS:</strong> La app Flutter (Rutmy Drive) activa Text-to-Speech al aproximarse a <2km de un radar/cámara/control policial verificado. Usa el motor TTS nativo del dispositivo (Android: Google TTS, iOS: AVSpeechSynthesizer). <br><br>
+        <strong>Tablas:</strong> <code>community_alert</code> con tipos: <code>radar_fijo, radar_movil, camara_semaforo, control_policial</code>. Los radares fijos y cámaras son persistentes. Radares móviles y controles policiales expiran en 4h si no hay reconfirmaciones.
+      </div>
+    </div>
+  </div>
+
+  <!-- Roadmap visual -->
+  <div class="section-title">📅 Roadmap Mapa Comunitario · 5 Fases</div>
+  <div class="card">
+    <div style="display:flex;gap:0;">
+      <div style="flex:1;padding:12px;border-right:1px solid rgba(255,255,255,0.06);text-align:center;">
+        <div style="font-weight:800;color:var(--mint);">M1</div>
+        <div style="font-size:0.7rem;color:var(--stone);">Sem 1-2</div>
+        <div style="font-size:0.75rem;color:#cbd5e1;margin-top:6px;">Tablas PostGIS<br>API comunitaria<br>Martin dinámico</div>
+      </div>
+      <div style="flex:1;padding:12px;border-right:1px solid rgba(255,255,255,0.06);text-align:center;">
+        <div style="font-weight:800;color:var(--gold);">M2</div>
+        <div style="font-size:0.7rem;color:var(--stone);">Sem 3-4</div>
+        <div style="font-size:0.75rem;color:#cbd5e1;margin-top:6px;">POIs render<br>Votación<br>Verificación</div>
+      </div>
+      <div style="flex:1;padding:12px;border-right:1px solid rgba(255,255,255,0.06);text-align:center;">
+        <div style="font-weight:800;color:var(--red);">M3</div>
+        <div style="font-size:0.7rem;color:var(--stone);">Sem 5-6</div>
+        <div style="font-size:0.75rem;color:#cbd5e1;margin-top:6px;">Cortes calle<br>Valhalla avoid<br>Reporte + dibujo</div>
+      </div>
+      <div style="flex:1;padding:12px;border-right:1px solid rgba(255,255,255,0.06);text-align:center;">
+        <div style="font-weight:800;color:var(--orange);">M4</div>
+        <div style="font-size:0.7rem;color:var(--stone);">Sem 7-8</div>
+        <div style="font-size:0.75rem;color:#cbd5e1;margin-top:6px;">Incidentes efímeros<br>Radares/cámaras<br>Alertas voz</div>
+      </div>
+      <div style="flex:1;padding:12px;text-align:center;">
+        <div style="font-weight:800;color:#A78BFA;">M5</div>
+        <div style="font-size:0.7rem;color:var(--stone);">Sem 9-10</div>
+        <div style="font-size:0.75rem;color:#cbd5e1;margin-top:6px;">Confianza<br>Anti-abuso<br>Moderación</div>
+      </div>
+    </div>
+    <div class="progress-bar" style="margin-top:12px;"><div class="fill green" style="width:0%;"></div></div>
+    <div style="text-align:center;font-size:0.65rem;color:var(--stone);margin-top:4px;">Progreso: 0% — Inicio pendiente de aprobación</div>
+  </div>
+
+</div><!-- /screen-mapa -->
+
+</div><!-- /main -->
+
+<script>
+function switchTab(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  document.querySelectorAll('.tabnav button').forEach(b => {
+    b.classList.remove('active');
+    if (b.textContent.toLowerCase().includes(name)) b.classList.add('active');
+  });
+}
+</script>
+
+</body>
+</html>

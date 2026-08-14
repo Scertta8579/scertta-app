@@ -47,7 +47,7 @@ npm install
 Crear `.env.local`:
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=https://cmuhwyxmluhnlzcasceq.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://TU_PROYECTO.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key_aqui
 NEXT_PUBLIC_MAPBOX_TOKEN=TU_TOKEN_AQUI
 RESEND_API_KEY=TU_API_AQUI

@@ -1,0 +1,42 @@
+# ============================================================================
+# Geocodificador self-hosted — Nominatim (OpenStreetMap)
+# ----------------------------------------------------------------------------
+# Conversión bidireccional texto ↔ coordenadas GPS a $0 costo, 100% en
+# infraestructura propia. Reemplaza la geocodificación de terceros.
+#
+# ZimaOS: storage-driver=vfs, bridge=none → usa network_mode:host.
+# Nominatim escucha en el puerto 8080 del host.
+#
+# Primer arranque: descarga + importa el extracto de Argentina (Geofabrik,
+# ~300 MB PBF) y tarda ~1–2 h. Luego queda operativo.
+#
+# Verificación en vivo:
+#   curl "http://localhost:8080/search?q=obelisco&format=json&countrycodes=ar"
+# ============================================================================
+services:
+  nominatim:
+    image: mediagis/nominatim:4.4
+    container_name: rutmy-nominatim
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      # Extracto de Argentina (Geofabrik) — importado al arrancar
+      PBF_URL: https://download.geofabrik.de/south-america/argentina-latest.osm.pbf
+      REPLICATION_URL: https://download.geofabrik.de/south-america/argentina-updates/
+      # Replicación diaria de cambios
+      REPLICATION_UPDATE_INTERVAL: "86400"
+      REPLICATION_RECHECK_INTERVAL: "3600"
+      NOMINATIM_PASSWORD: "${NOMINATIM_PASSWORD:-cambiar-esta-clave}"
+    volumes:
+      - nominatim-pgdata:/var/lib/postgresql/14/main
+      - nominatim-flatnode:/nominatim/flatnode
+    shm_size: 1gb
+    mem_limit: 6g
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  nominatim-pgdata:
+  nominatim-flatnode:

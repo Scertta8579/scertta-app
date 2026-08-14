@@ -1,16 +1,18 @@
 "use client";
+import "@/lib/pmtiles-setup";
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import Map, {
   NavigationControl,
+  GeolocateControl,
   Source,
   Layer,
   Marker,
   type MapRef,
-} from "react-map-gl/mapbox";
+} from "react-map-gl/maplibre";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-import "mapbox-gl/dist/mapbox-gl.css";
+import "maplibre-gl/dist/maplibre-gl.css";
 import { supabase } from "@/lib/supabaseClient";
 import ConfiguradorPromo from "./ConfiguradorPromo";
 import VisualizadorLiquidez from "./VisualizadorLiquidez";
@@ -20,13 +22,17 @@ import {
   convertirAGeoJSON,
   type SugerenciaPromocion,
 } from "@/lib/heatmapUtils";
-import { Square, Trash2, Flame, FlagOff, Siren } from "lucide-react";
+import { Square, Trash2, Flame, FlagOff, Siren, Paintbrush } from "lucide-react";
+import ZoomHexWidget from "./ZoomHexWidget";
+import CapaHexagonosH3 from "./CapaHexagonosH3";
+import * as h3 from "h3-js";
+import { servicioNombrePorMicro, etiquetaServicio } from "@/lib/serviciosH3";
 import {
   fetchPanicIncidentsForMap,
   type PanicMapPoint,
 } from "@/lib/ceoDashboardMetrics";
 import {
-  fetchMapboxDrivingRoute,
+  fetchValhallaRoute,
   straightLineRoute,
   SCERTTA_RESPONSE_HUB_LNGLAT,
 } from "@/lib/mapDirections";
@@ -42,7 +48,13 @@ interface Promocion {
   tipo_geometria: "circle" | "polygon";
 }
 
-export default function GestorPromocionesGeograficas() {
+export default function GestorPromocionesGeograficas({
+  vertical,
+  activeLayers,
+}: {
+  vertical?: string;
+  activeLayers?: Set<string>;
+}) {
   const mapRef = useRef<MapRef | null>(null);
   const drawRef = useRef<MapboxDraw | null>(null);
 
@@ -58,12 +70,20 @@ export default function GestorPromocionesGeograficas() {
   const [showConfigurador, setShowConfigurador] = useState(false);
   const [modoSeleccion, setModoSeleccion] = useState<"circle" | "polygon">("polygon");
   const [mostrarHeatmap, setMostrarHeatmap] = useState(false);
+  const [mostrarHexagonos, setMostrarHexagonos] = useState(false);
   const [datosHeatmap, setDatosHeatmap] = useState<any>(null);
   const [panicPoints, setPanicPoints] = useState<PanicMapPoint[]>([]);
   const [routesGeojson, setRoutesGeojson] =
     useState<GeoJSON.FeatureCollection | null>(null);
 
-  const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+  // ─── H3 multiservicio ────────────────────────────────────
+  const [provinciaId, setProvinciaId] = useState<string>("");
+  const [servicioIds, setServicioIds] = useState<Record<string, string>>({}); // nombre servicio → uuid
+  const [modoPincel, setModoPincel] = useState(false);
+  const [hexSeleccionados, setHexSeleccionados] = useState<Set<string>>(new Set<string>([]));
+  const [aplicando, setAplicando] = useState(false);
+  const [brushServicio, setBrushServicio] = useState<string>("");
+  const [brushMultiplicador, setBrushMultiplicador] = useState<number>(0.85);
 
   const refreshPanicIncidents = useCallback(async () => {
     const pts = await fetchPanicIncidentsForMap(supabase);
@@ -207,6 +227,37 @@ export default function GestorPromocionesGeograficas() {
     void refreshPanicIncidents();
   }, [refreshPanicIncidents]);
 
+  // Resolver provincia + servicios activos (H3 multiservicio)
+  useEffect(() => {
+    let cancelado = false;
+    (async () => {
+      const { data: prov } = await supabase
+        .from("provincias")
+        .select("id")
+        .eq("codigo", "AR-B")
+        .maybeSingle();
+      if (prov && !cancelado) setProvinciaId(prov.id);
+
+      if (vertical && activeLayers && activeLayers.size > 0) {
+        const nombres = Array.from(activeLayers).map((m) =>
+          servicioNombrePorMicro(vertical, m),
+        );
+        const { data: tipos } = await supabase
+          .from("tipos_servicio")
+          .select("id, nombre")
+          .in("nombre", nombres);
+        const map: Record<string, string> = {};
+        if (tipos) {
+          for (const t of tipos) map[t.nombre] = t.id;
+        }
+        if (!cancelado) setServicioIds(map);
+      }
+    })();
+    return () => {
+      cancelado = true;
+    };
+  }, [vertical, activeLayers]);
+
   useEffect(() => {
     const ch = supabase
       .channel("ceo-map-security-incidents")
@@ -228,7 +279,7 @@ export default function GestorPromocionesGeograficas() {
   }, [refreshPanicIncidents]);
 
   useEffect(() => {
-    if (!mapboxToken || panicPoints.length === 0) {
+    if (panicPoints.length === 0) {
       setRoutesGeojson(null);
       return;
     }
@@ -236,8 +287,7 @@ export default function GestorPromocionesGeograficas() {
     (async () => {
       const features: GeoJSON.Feature[] = [];
       for (const p of panicPoints) {
-        const driving = await fetchMapboxDrivingRoute(
-          mapboxToken,
+        const driving = await fetchValhallaRoute(
           [p.lng, p.lat],
           SCERTTA_RESPONSE_HUB_LNGLAT
         );
@@ -260,7 +310,7 @@ export default function GestorPromocionesGeograficas() {
     return () => {
       cancelled = true;
     };
-  }, [mapboxToken, panicPoints]);
+  }, [panicPoints]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -340,15 +390,57 @@ export default function GestorPromocionesGeograficas() {
     }
   };
 
-  if (!mapboxToken) {
-    return (
-      <div className="flex items-center justify-center h-96 bg-zinc-900 rounded-lg">
-        <p className="text-red-500 font-semibold">
-          Error: Token de Mapbox no configurado
-        </p>
-      </div>
-    );
-  }
+  // ─── H3: pincel multi-selección ──────────────────────────
+  const serviciosActivos = (vertical && activeLayers
+    ? Array.from(activeLayers)
+        .map((m) => ({ micro: m, nombre: servicioNombrePorMicro(vertical, m) }))
+        .filter((s) => servicioIds[s.nombre])
+        .map((s) => ({ micro: s.micro, nombre: s.nombre, uuid: servicioIds[s.nombre] }))
+    : []
+  );
+
+  const handleMapClick = useCallback(
+    (e: { lngLat: { lat: number; lng: number } }) => {
+      if (!modoPincel || !mostrarHexagonos) return;
+      const cell = h3.latLngToCell(e.lngLat.lat, e.lngLat.lng, 8);
+      setHexSeleccionados((prev) => {
+        const next = new Set<string>(prev);
+        if (next.has(cell)) next.delete(cell);
+        else next.add(cell);
+        return next;
+      });
+    },
+    [modoPincel, mostrarHexagonos],
+  );
+
+  const aplicarReglaSeleccion = async (
+    servicioUuid: string,
+    multiplicador: number,
+    etiqueta?: string,
+  ) => {
+    if (hexSeleccionados.size === 0 || !provinciaId) return;
+    setAplicando(true);
+    try {
+      const filas = Array.from(hexSeleccionados).map((h3Idx) => ({
+        provincia_id: provinciaId,
+        servicio_id: servicioUuid,
+        h3_index: h3Idx,
+        resolucion: 8,
+        multiplicador,
+        etiqueta: etiqueta || null,
+        activo: true,
+      }));
+      const { error } = await supabase
+        .from("hexagonos_tarifarios")
+        .upsert(filas, { onConflict: "provincia_id,servicio_id,h3_index,resolucion" });
+      if (!error) {
+        setHexSeleccionados(new Set<string>([]));
+        setModoPincel(false);
+      }
+    } finally {
+      setAplicando(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -393,10 +485,22 @@ export default function GestorPromocionesGeograficas() {
           <button
             type="button"
             onClick={() => iniciarDibujo("polygon")}
-            className="flex items-center gap-2 px-4 py-2 bg-scertta-blue text-white rounded-lg hover:bg-scertta-blue/90 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-rutmy-agua text-rutmy-deep rounded-lg hover:bg-rutmy-agua/90 transition-colors"
           >
             <Square className="w-4 h-4" />
             Dibujar zona (polígono)
+          </button>
+          <button
+            type="button"
+            onClick={() => setModoPincel(!modoPincel)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              modoPincel
+                ? "bg-rutmy-agua text-rutmy-deep"
+                : "bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700"
+            }`}
+          >
+            <Paintbrush className="w-4 h-4" />
+            Pincel H3{hexSeleccionados.size > 0 ? ` (${hexSeleccionados.size})` : ""}
           </button>
           <button
             onClick={limpiarDibujo}
@@ -410,17 +514,79 @@ export default function GestorPromocionesGeograficas() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <div className="relative h-[600px] rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800">
+          <div className="relative h-[calc(100vh-280px)] min-h-[500px] rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800">
+            {/* Panel flotante de pincel H3 */}
+            {modoPincel && hexSeleccionados.size > 0 && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex flex-wrap items-center gap-2 rounded-xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur px-3 py-2 shadow-lg border border-zinc-200 dark:border-zinc-700">
+                <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                  {hexSeleccionados.size} hexágonos
+                </span>
+                <select
+                  value={brushServicio}
+                  onChange={(e) => setBrushServicio(e.target.value)}
+                  className="rounded-lg border border-zinc-300 dark:border-zinc-600 bg-transparent px-2 py-1 text-xs text-zinc-700 dark:text-zinc-200"
+                >
+                  <option value="">Elegir servicio…</option>
+                  {serviciosActivos.map((s) => (
+                    <option key={s.uuid} value={s.uuid}>
+                      {etiquetaServicio(vertical ?? "", s.micro)}
+                    </option>
+                  ))}
+                </select>
+                {[-0.3, -0.15, 0.15, 0.3].map((d) => (
+                  <button
+                    key={d}
+                    type="button"
+                    onClick={() => setBrushMultiplicador(1 + d)}
+                    className={`px-2 py-1 rounded-lg text-xs font-bold ${
+                      brushMultiplicador === 1 + d
+                        ? "bg-rutmy-agua text-rutmy-deep"
+                        : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300"
+                    }`}
+                  >
+                    {d > 0 ? `+${Math.round(d * 100)}%` : `${Math.round(d * 100)}%`}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  disabled={!brushServicio || aplicando}
+                  onClick={() => aplicarReglaSeleccion(brushServicio, brushMultiplicador)}
+                  className="px-3 py-1 rounded-lg bg-rutmy-agua text-rutmy-deep text-xs font-bold disabled:opacity-50"
+                >
+                  {aplicando ? "Aplicando…" : "Aplicar"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setHexSeleccionados(new Set<string>([]))}
+                  className="text-xs text-zinc-400 hover:text-zinc-600"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
             <Map
               ref={mapRef}
               {...viewState}
               onLoad={() => setMapLoaded(true)}
               onMove={(evt) => setViewState(evt.viewState)}
-              mapStyle="mapbox://styles/mapbox/dark-v11"
-              mapboxAccessToken={mapboxToken}
+              onClick={handleMapClick}
+              mapStyle="https://rutmy.com/style.json"
               style={{ width: "100%", height: "100%" }}
             >
               <NavigationControl position="top-right" />
+              <GeolocateControl
+                position="top-right"
+                positionOptions={{ enableHighAccuracy: true }}
+                trackUserLocation={true}
+                showAccuracyCircle={true}
+                showUserLocation={true}
+              />
+              {/* Widget flotante: Zoom + H3 */}
+              <ZoomHexWidget
+                zoom={viewState.zoom}
+                h3Visible={mostrarHexagonos}
+                onToggleH3={() => setMostrarHexagonos(!mostrarHexagonos)}
+              />
 
               {routesGeojson && routesGeojson.features.length > 0 ? (
                 <Source id="panic-routes" type="geojson" data={routesGeojson}>
@@ -525,6 +691,18 @@ export default function GestorPromocionesGeograficas() {
                   />
                 </Source>
               )}
+
+              {/* Capas H3 multiservicio (una por servicio activo) */}
+              {mostrarHexagonos && provinciaId && serviciosActivos.map((s) => (
+                <CapaHexagonosH3
+                  key={s.uuid}
+                  provinciaId={provinciaId}
+                  servicioId={s.uuid}
+                  visible={mostrarHexagonos}
+                  modoPincel={modoPincel}
+                  seleccionados={hexSeleccionados}
+                />
+              ))}
               
               {promociones.map((promo) => (
                 <Source
@@ -583,7 +761,7 @@ export default function GestorPromocionesGeograficas() {
           )}
 
           <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4">
-            <h3 className="font-semibold mb-4">Promociones Activas</h3>
+            <h3 className="font-semibold mb-4 text-gray-900 dark:text-white">Promociones Activas</h3>
             <div className="space-y-3">
               {promociones.map((promo) => (
                 <div
@@ -592,11 +770,11 @@ export default function GestorPromocionesGeograficas() {
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h4 className="font-medium text-sm">{promo.nombre}</h4>
+                      <h4 className="font-medium text-sm text-gray-900 dark:text-white">{promo.nombre}</h4>
                       <p className="text-xs text-gray-600 dark:text-gray-400">
                         {promo.porcentaje_descuento}% descuento
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-500">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
                         {promo.horario_inicio} - {promo.horario_fin}
                       </p>
                     </div>
@@ -626,7 +804,7 @@ export default function GestorPromocionesGeograficas() {
                 </div>
               ))}
               {promociones.length === 0 && (
-                <p className="text-sm text-gray-500 text-center py-4">
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
                   No hay promociones creadas
                 </p>
               )}
@@ -634,7 +812,7 @@ export default function GestorPromocionesGeograficas() {
           </div>
 
           <div>
-            <h3 className="font-semibold mb-4">Contabilidad / Finanzas</h3>
+            <h3 className="font-semibold mb-4 text-gray-900 dark:text-white">Contabilidad / Finanzas</h3>
             <VisualizadorLiquidez promociones={promociones} />
           </div>
         </div>

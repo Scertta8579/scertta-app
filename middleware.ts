@@ -94,6 +94,15 @@ export const config = {
     "/back-office/:path*",
     "/ceo-dashboard/:path*",
     "/marketing/:path*",
+    "/finanzas/:path*",
+    "/gerencia/:path*",
+    "/flota/:path*",
+    "/rrhh/:path*",
+    "/soporte/:path*",
+    "/hub/:path*",
+    "/admin/:path*",
+    "/legales/:path*",
+    "/api/:path*",
   ],
 };
 

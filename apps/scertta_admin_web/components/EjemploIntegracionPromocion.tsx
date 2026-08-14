@@ -123,7 +123,7 @@ export default function EjemploIntegracionPromocion() {
           <button
             onClick={verificarYAplicarDescuento}
             disabled={cargando}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-scertta-blue text-white rounded-lg hover:bg-scertta-blue/90 transition-colors font-medium disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-rutmy-agua text-rutmy-deep rounded-lg hover:bg-rutmy-agua/90 transition-colors font-medium disabled:opacity-50"
           >
             {cargando ? (
               <>
@@ -182,7 +182,7 @@ export default function EjemploIntegracionPromocion() {
                   </div>
                   <div className="pt-2 border-t border-gray-300 dark:border-gray-600 flex justify-between items-center">
                     <span className="font-semibold">Precio Final:</span>
-                    <span className="text-2xl font-bold text-scertta-blue">
+                    <span className="text-2xl font-bold text-rutmy-agua">
                       {formatCurrency(resultado.precioFinal)}
                     </span>
                   </div>

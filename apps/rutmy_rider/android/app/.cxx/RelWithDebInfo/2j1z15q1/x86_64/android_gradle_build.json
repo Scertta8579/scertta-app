@@ -1,0 +1,28 @@
+{
+  "buildFiles": [
+    "/usr/local/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/usr/local/android-sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/DATA/AppData/scertta_workspace/scertta-app/apps/scertta_rider/android/app/.cxx/RelWithDebInfo/2j1z15q1/x86_64",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/usr/local/android-sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/DATA/AppData/scertta_workspace/scertta-app/apps/scertta_rider/android/app/.cxx/RelWithDebInfo/2j1z15q1/x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {},
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "/usr/local/android-sdk/ndk/26.3.11579264/toolchains/llvm/prebuilt/linux-x86_64/bin/clang.lld",
+      "cppCompilerExecutable": "/usr/local/android-sdk/ndk/26.3.11579264/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++.lld"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": []
+}

@@ -34,7 +34,7 @@
   "shared_services": {
     "backend": {
       "name": "Supabase",
-      "url": "https://cmuhwyxmluhnlzcasceq.supabase.co",
+      "url": "https://TU_PROYECTO.supabase.co",
       "services": ["auth", "database", "storage", "edge-functions"]
     },
     "maps": {

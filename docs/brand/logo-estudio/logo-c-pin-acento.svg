@@ -1,0 +1,22 @@
+<svg width="400" height="100" viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Opción C: Pin flotante sobre la "u" — como un acento, elegante y sutil -->
+  <defs>
+    <linearGradient id="pgrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#64DEB2"/>
+      <stop offset="100%" stop-color="#34D399"/>
+    </linearGradient>
+  </defs>
+  <!-- R -->
+  <path d="M18 30 L18 85" stroke="#0F172A" stroke-width="9" stroke-linecap="square"/>
+  <path d="M18 30 Q56 30 58 50 Q60 66 40 66 L18 66" fill="none" stroke="#0F172A" stroke-width="9" stroke-linecap="square"/>
+  <path d="M36 66 L66 85" stroke="#0F172A" stroke-width="9" stroke-linecap="square"/>
+  <!-- u t m y (u en mint como en la web) -->
+  <text x="82" y="78" font-family="'Inter','Segoe UI',system-ui,sans-serif" font-weight="800" font-size="58" fill="url(#pgrad)" letter-spacing="3">u</text>
+  <text x="122" y="78" font-family="'Inter','Segoe UI',system-ui,sans-serif" font-weight="800" font-size="58" fill="#0F172A" letter-spacing="3">t</text>
+  <text x="152" y="78" font-family="'Inter','Segoe UI',system-ui,sans-serif" font-weight="800" font-size="58" fill="#0F172A" letter-spacing="3">m</text>
+  <text x="210" y="78" font-family="'Inter','Segoe UI',system-ui,sans-serif" font-weight="800" font-size="58" fill="#0F172A" letter-spacing="3">y</text>
+  <!-- Pin flotante como acento sobre la u -->
+  <path d="M96 10 Q96 4 101 2 Q106 4 106 10 Q106 18 101 22 Q96 18 96 10Z" fill="url(#pgrad)" opacity="0.9"/>
+  <circle cx="101" cy="8" r="2.5" fill="#0F172A"/>
+  <line x1="101" y1="22" x2="101" y2="16" stroke="url(#pgrad)" stroke-width="1.5" stroke-linecap="round" opacity="0"/>
+</svg>

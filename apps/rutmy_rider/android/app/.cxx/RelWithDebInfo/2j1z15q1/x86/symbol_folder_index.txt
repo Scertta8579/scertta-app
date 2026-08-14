@@ -1,0 +1,1 @@
+/DATA/AppData/scertta_workspace/scertta-app/apps/scertta_rider/build/app/intermediates/cxx/RelWithDebInfo/2j1z15q1/obj/x86

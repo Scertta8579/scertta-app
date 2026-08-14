@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "74005243911",
+    "project_id": "scertta-f46ce",
+    "storage_bucket": "scertta-f46ce.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:74005243911:android:1598697e7fd2909488e2a2",
+        "android_client_info": {
+          "package_name": "com.rutmy.rider"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIza_TU_GOOGLE_API_KEY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:74005243911:android:299405146ac8837f88e2a2",
+        "android_client_info": {
+          "package_name": "com.rutmy.driver"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIza_TU_GOOGLE_API_KEY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

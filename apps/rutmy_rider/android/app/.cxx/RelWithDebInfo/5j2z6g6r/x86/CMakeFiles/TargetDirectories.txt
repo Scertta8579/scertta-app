@@ -1,0 +1,2 @@
+/DATA/AppData/scertta_workspace/scertta-app/apps/rutmy_rider/android/app/.cxx/RelWithDebInfo/5j2z6g6r/x86/CMakeFiles/edit_cache.dir
+/DATA/AppData/scertta_workspace/scertta-app/apps/rutmy_rider/android/app/.cxx/RelWithDebInfo/5j2z6g6r/x86/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,51 @@
+# Agent Bridge — Configuración de agentes y modelos
+# Las claves van en $HERMES_HOME/.env (NUNCA aquí). Aquí solo referencias y parámetros.
+
+orquestador:
+  modo: supervision        # "supervision" = Hermes aprueba; "auto" = ejecuta solo
+  bus_dir: bus             # directorio del bus de mensajes
+  memoria_dir: memory      # directorio de memoria compartida
+
+agentes:
+  luna:
+    descripcion: "Especialista en visión, UI/UX y WCAG"
+    proveedor: openrouter
+    modelo: openai/gpt-5.6-luna
+    endpoint: https://openrouter.ai/api/v1/chat/completions
+    env_key: OPENROUTER_API_KEY
+    rol: vision
+    memoria: true          # consulta .cursorrules + decisiones antes de responder
+
+  deepseek:
+    descripcion: "Especialista en lógica, SQL y arquitectura"
+    proveedor: deepseek
+    modelo: deepseek/deepseek-v4-pro
+    endpoint: https://api.deepseek.com/v1/chat/completions
+    env_key: DEEPSEEK_API_KEY
+    rol: logica
+    memoria: true
+
+  codex:
+    descripcion: "Especialista en terminal y ejecución de código"
+    proveedor: codex_cli
+    modelo: gpt-5-codex
+    rol: terminal
+    memoria: true
+
+memoria:
+  biblia: /DATA/AppData/scertta_workspace/scertta-app/.cursorrules
+  decisiones: memory/decisions.json
+  graphify:
+    habilitado: true
+    mcp_server: graph-query          # MCP Graphify ya montado en Hermes
+    vault: /DATA/kai-vault
+
+vision:
+  capturas_dir: /tmp/screenshots
+  playwright: /tmp/screenshot-tool
+  contraste:
+    # Ratios verificados matemáticamente (NO confiar en Luna para estos números)
+    verde_agua: "#64DEB2"
+    verde_agua_oscuro: "#0E7C5E"
+    fondo_oscuro: "#0F172A"
+    texto_sobre_boton: "#0F172A"     # SIEMPRE oscuro, nunca blanco

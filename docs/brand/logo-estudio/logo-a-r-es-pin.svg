@@ -1,0 +1,22 @@
+<svg width="400" height="90" viewBox="0 0 400 90" xmlns="http://www.w3.org/2000/svg">
+  <!-- Opción A: La "R" es el pin — la pata se alarga como aguja de ubicación -->
+  <defs>
+    <linearGradient id="rgrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#64DEB2"/>
+      <stop offset="100%" stop-color="#34D399"/>
+    </linearGradient>
+  </defs>
+  <!-- R transformada: el bowl normal, la pata se extiende recta como aguja -->
+  <path d="M22 20 L22 78" stroke="#0F172A" stroke-width="9" stroke-linecap="square"/>
+  <path d="M22 20 Q60 20 62 40 Q64 58 40 58 L22 58" fill="none" stroke="#0F172A" stroke-width="9" stroke-linecap="square"/>
+  <path d="M40 58 L70 78" stroke="#0F172A" stroke-width="9" stroke-linecap="square"/>
+  <!-- Círculo de destino en la R -->
+  <circle cx="22" cy="78" r="8" fill="url(#rgrad)"/>
+  <!-- u t m y -->
+  <text x="82" y="68" font-family="'Inter','Segoe UI',system-ui,sans-serif" font-weight="800" font-size="58" fill="#0F172A" letter-spacing="3">u</text>
+  <text x="122" y="68" font-family="'Inter','Segoe UI',system-ui,sans-serif" font-weight="800" font-size="58" fill="#0F172A" letter-spacing="3">t</text>
+  <text x="152" y="68" font-family="'Inter','Segoe UI',system-ui,sans-serif" font-weight="800" font-size="58" fill="#0F172A" letter-spacing="3">m</text>
+  <text x="210" y="68" font-family="'Inter','Segoe UI',system-ui,sans-serif" font-weight="800" font-size="58" fill="#0F172A" letter-spacing="3">y</text>
+  <!-- La "u" coloreada en mint (marca de la casa) -->
+  <rect x="82" y="12" width="32" height="60" fill="url(#rgrad)" rx="2" opacity="0.12"/>
+</svg>

@@ -1,0 +1,2 @@
+/DATA/AppData/scertta_workspace/scertta-app/apps/scertta_rider/android/app/.cxx/RelWithDebInfo/2j1z15q1/armeabi-v7a/CMakeFiles/edit_cache.dir
+/DATA/AppData/scertta_workspace/scertta-app/apps/scertta_rider/android/app/.cxx/RelWithDebInfo/2j1z15q1/armeabi-v7a/CMakeFiles/rebuild_cache.dir

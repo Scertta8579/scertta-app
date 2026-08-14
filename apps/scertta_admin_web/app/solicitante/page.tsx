@@ -6,7 +6,7 @@ export default function SolicitantePage() {
           <h1 className="text-lg font-semibold tracking-tight">
             Solicitante — <span translate="no" className="notranslate">Scertta</span>
           </h1>
-          <span className="rounded-full bg-scertta-blue/10 px-3 py-1 text-xs font-medium text-scertta-blue">
+          <span className="rounded-full bg-rutmy-agua/10 px-3 py-1 text-xs font-medium text-rutmy-agua">
             Pedir servicios de movilidad
           </span>
         </div>

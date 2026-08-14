@@ -127,7 +127,7 @@ export default function VisualizadorLiquidez({
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold">Visualización de Liquidez</h3>
         {cargando && (
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-scertta-blue"></div>
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-rutmy-agua"></div>
         )}
       </div>
 

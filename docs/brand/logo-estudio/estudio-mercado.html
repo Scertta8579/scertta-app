@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rutmy — Estudio de Mercado · Logo</title>
+<style>
+  :root {
+    --deep: #0F172A;
+    --mint: #64DEB2;
+    --cyan: #0891B2;
+    --slate: #334155;
+    --stone: #78716C;
+    --white: #FFFFFF;
+    --sand: #F8FAFC;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: var(--sand);
+    color: var(--slate);
+    line-height: 1.6;
+    padding: 2rem;
+  }
+  .container { max-width: 1000px; margin: 0 auto; }
+  h1 { font-size: 2rem; color: var(--deep); margin-bottom: 1.5rem; }
+  h1 span { color: var(--mint); }
+  h2 {
+    font-size: 1.3rem; color: var(--deep);
+    border-bottom: 2px solid var(--mint);
+    padding-bottom: 0.4rem; margin: 2.5rem 0 1.2rem;
+  }
+  h3 { color: var(--deep); margin-bottom: 0.5rem; }
+
+  .competitors {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .comp-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .comp-card .name { font-weight: 700; font-size: 1.1rem; color: var(--deep); }
+  .comp-card .type { font-size: 0.8rem; color: var(--stone); margin: 0.3rem 0; }
+  .comp-card .colors { font-size: 0.75rem; color: var(--stone); }
+  .comp-icon {
+    width: 64px; height: 64px;
+    margin: 0 auto 1rem;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 800;
+  }
+
+  .options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .option-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .option-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  }
+  .option-card.selected {
+    border: 3px solid var(--mint);
+    box-shadow: 0 4px 24px rgba(100,222,178,0.25);
+  }
+  .option-card h3 {
+    padding: 1rem 1.5rem 0;
+    font-size: 1.1rem;
+  }
+  .option-card .label {
+    padding: 0 1.5rem;
+    font-size: 0.8rem;
+    color: var(--stone);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .option-preview {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .option-preview.dark { background: var(--deep); }
+  .option-preview.light { background: var(--white); border-bottom: 1px solid #E2E8F0; }
+  .option-details {
+    padding: 0 1.5rem 1.5rem;
+    font-size: 0.85rem;
+    color: var(--stone);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .tag {
+    background: var(--sand);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+  .tag.good { background: #ECFDF5; color: #059669; }
+  .tag.warn { background: #FFF7ED; color: #D97706; }
+
+  .small-icons {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+  .small-icons svg { border-radius: 8px; }
+
+  .verdict {
+    background: var(--deep);
+    color: white;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-top: 2rem;
+  }
+  .verdict h2 { color: var(--mint); border-bottom-color: var(--mint); }
+  .verdict p { color: rgba(255,255,255,0.8); }
+
+  .recommendation {
+    background: linear-gradient(135deg, var(--mint), #34D399);
+    color: var(--deep);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin-top: 1.5rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Estudio de <span>Mercado</span> · Logo Rutmy</h1>
+
+<!-- COMPETIDORES -->
+<h2>📊 Panorama competitivo</h2>
+<div class="competitors">
+  <div class="comp-card">
+    <div class="comp-icon" style="background:#000;color:white;">U</div>
+    <div class="name">Uber</div>
+    <div class="type">Tipográfico</div>
+    <div class="colors">1 color · Negro</div>
+  </div>
+  <div class="comp-card">
+    <div class="comp-icon" style="background:#FF6B00;color:white;">D</div>
+    <div class="name">Didi</div>
+    <div class="type">Tipográfico</div>
+    <div class="colors">2 colores · Naranja</div>
+  </div>
+  <div class="comp-card">
+    <div class="comp-icon" style="background:#6B3FA0;color:white;">C</div>
+    <div class="name">Cabify</div>
+    <div class="type">Tipográfico</div>
+    <div class="colors">2 colores · Morado</div>
+  </div>
+  <div class="comp-card">
+    <div class="comp-icon" style="background:#00B028;color:white;">♫</div>
+    <div class="name">Beat</div>
+    <div class="type">Abstracto</div>
+    <div class="colors">1 color · Verde</div>
+  </div>
+  <div class="comp-card" style="border:2px solid var(--mint);">
+    <div class="comp-icon" style="background:var(--deep);color:var(--mint);">📍</div>
+    <div class="name">Rutmy</div>
+    <div class="type">Abstracto (propuesta)</div>
+    <div class="colors">2 colores · Deep + Mint</div>
+  </div>
+</div>
+
+<p style="color:var(--stone);font-size:0.9rem;">
+<strong>Oportunidad detectada:</strong> Nadie en movilidad usa un <strong>pin de ubicación abstracto</strong> como ícono principal.
+Todos son letras. Rutmy puede ser el primero en apropiarse de ese símbolo — y el nombre "Rutmy" (ruta + my) lo refuerza naturalmente.
+</p>
+
+<!-- 3 PROPUESTAS -->
+<h2>🎨 3 Propuestas de Ícono Abstracto</h2>
+<p style="color:var(--stone);margin-bottom:1.5rem;">
+Todas funcionan sin texto. Paleta: <strong style="color:var(--deep);">deep #0F172A</strong> + <strong style="color:var(--mint);">mint #64DEB2</strong>. Pin de ubicación estilizado.
+</p>
+
+<div class="options">
+
+  <!-- OPCIÓN 1 -->
+  <div class="option-card">
+    <h3>Opción 1 · Pin Geométrico</h3>
+    <div class="label">Angular · Tecnológico · Premium</div>
+    <div class="option-preview dark">
+      <svg width="120" height="120" viewBox="0 0 200 200"><defs><linearGradient id="g1a" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#64DEB2"/><stop offset="100%" stop-color="#0F172A"/></linearGradient></defs><path d="M100 30 L145 90 Q150 98 145 105 L110 145 Q100 160 90 145 L55 105 Q50 98 55 90 Z" fill="url(#g1a)"/><circle cx="100" cy="75" r="18" fill="#0F172A"/><circle cx="100" cy="75" r="8" fill="#64DEB2"/></svg>
+    </div>
+    <div class="option-preview light">
+      <svg width="80" height="80" viewBox="0 0 200 200"><defs><linearGradient id="g1b" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#64DEB2"/><stop offset="100%" stop-color="#0F172A"/></linearGradient></defs><path d="M100 30 L145 90 Q150 98 145 105 L110 145 Q100 160 90 145 L55 105 Q50 98 55 90 Z" fill="url(#g1b)"/><circle cx="100" cy="75" r="18" fill="#0F172A"/><circle cx="100" cy="75" r="8" fill="#64DEB2"/></svg>
+      <div class="small-icons">
+        <svg width="32" height="32" viewBox="0 0 200 200"><path d="M100 30 L145 90 Q150 98 145 105 L110 145 Q100 160 90 145 L55 105 Q50 98 55 90 Z" fill="url(#g1b)"/><circle cx="100" cy="75" r="18" fill="#0F172A"/><circle cx="100" cy="75" r="8" fill="#64DEB2"/></svg>
+        <svg width="16" height="16" viewBox="0 0 200 200"><path d="M100 30 L145 90 Q150 98 145 105 L110 145 Q100 160 90 145 L55 105 Q50 98 55 90 Z" fill="url(#g1b)"/></svg>
+      </div>
+    </div>
+    <div class="option-details">
+      <span class="tag good">Reconocible a 16px</span>
+      <span class="tag good">Funciona sin texto</span>
+      <span class="tag">Líneas rectas</span>
+      <span class="tag">Fondo claro y oscuro</span>
+    </div>
+  </div>
+
+  <!-- OPCIÓN 2 -->
+  <div class="option-card">
+    <h3>Opción 2 · Pin Fluido</h3>
+    <div class="label">Orgánico · Cálido · Cercano</div>
+    <div class="option-preview dark">
+      <svg width="120" height="120" viewBox="0 0 200 200"><defs><linearGradient id="g2a" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#64DEB2"/><stop offset="100%" stop-color="#0F172A"/></linearGradient></defs><path d="M100 28 Q145 28 150 80 Q155 120 120 148 Q105 168 100 180 Q95 168 80 148 Q45 120 50 80 Q55 28 100 28Z" fill="url(#g2a)"/><circle cx="100" cy="78" r="22" fill="none" stroke="#0F172A" stroke-width="7"/><circle cx="100" cy="78" r="5" fill="#64DEB2"/></svg>
+    </div>
+    <div class="option-preview light">
+      <svg width="80" height="80" viewBox="0 0 200 200"><defs><linearGradient id="g2b" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#64DEB2"/><stop offset="100%" stop-color="#0F172A"/></linearGradient></defs><path d="M100 28 Q145 28 150 80 Q155 120 120 148 Q105 168 100 180 Q95 168 80 148 Q45 120 50 80 Q55 28 100 28Z" fill="url(#g2b)"/><circle cx="100" cy="78" r="22" fill="none" stroke="#0F172A" stroke-width="7"/><circle cx="100" cy="78" r="5" fill="#64DEB2"/></svg>
+      <div class="small-icons">
+        <svg width="32" height="32" viewBox="0 0 200 200"><path d="M100 28 Q145 28 150 80 Q155 120 120 148 Q105 168 100 180 Q95 168 80 148 Q45 120 50 80 Q55 28 100 28Z" fill="url(#g2b)"/><circle cx="100" cy="78" r="18" fill="#0F172A"/></svg>
+        <svg width="16" height="16" viewBox="0 0 200 200"><path d="M100 28 Q145 28 150 80 Q155 120 120 148 Q105 168 100 180 Q95 168 80 148 Q45 120 50 80 Q55 28 100 28Z" fill="url(#g2b)"/></svg>
+      </div>
+    </div>
+    <div class="option-details">
+      <span class="tag good">Suave y humano</span>
+      <span class="tag good">Funciona sin texto</span>
+      <span class="tag">Curvas redondeadas</span>
+      <span class="tag warn">Menos nítido a 16px</span>
+    </div>
+  </div>
+
+  <!-- OPCIÓN 3 -->
+  <div class="option-card">
+    <h3>Opción 3 · Pin + Ruta</h3>
+    <div class="label">Simbólico · Narrativo · Único</div>
+    <div class="option-preview dark">
+      <svg width="120" height="120" viewBox="0 0 200 200"><defs><linearGradient id="g3a" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#64DEB2"/><stop offset="100%" stop-color="#0F172A"/></linearGradient></defs><path d="M100 16 Q150 16 155 72 Q160 115 130 142 Q110 165 100 178 Q90 165 70 142 Q40 115 45 72 Q50 16 100 16Z" fill="url(#g3a)"/><path d="M100 56 L100 132" stroke="#0F172A" stroke-width="6" stroke-linecap="round"/><path d="M100 90 Q123 88 130 72" stroke="#0F172A" stroke-width="6" stroke-linecap="round" fill="none"/><circle cx="100" cy="56" r="5" fill="#0F172A"/><circle cx="100" cy="132" r="5" fill="#64DEB2"/></svg>
+    </div>
+    <div class="option-preview light">
+      <svg width="80" height="80" viewBox="0 0 200 200"><defs><linearGradient id="g3b" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#64DEB2"/><stop offset="100%" stop-color="#0F172A"/></linearGradient></defs><path d="M100 16 Q150 16 155 72 Q160 115 130 142 Q110 165 100 178 Q90 165 70 142 Q40 115 45 72 Q50 16 100 16Z" fill="url(#g3b)"/><path d="M100 56 L100 132" stroke="#0F172A" stroke-width="6" stroke-linecap="round"/><path d="M100 90 Q123 88 130 72" stroke="#0F172A" stroke-width="6" stroke-linecap="round" fill="none"/><circle cx="100" cy="56" r="5" fill="#0F172A"/><circle cx="100" cy="132" r="5" fill="#64DEB2"/></svg>
+      <div class="small-icons">
+        <svg width="32" height="32" viewBox="0 0 200 200"><path d="M100 16 Q150 16 155 72 Q160 115 130 142 Q110 165 100 178 Q90 165 70 142 Q40 115 45 72 Q50 16 100 16Z" fill="url(#g3b)"/><circle cx="100" cy="100" r="10"/></svg>
+        <svg width="16" height="16" viewBox="0 0 200 200"><path d="M100 16 Q150 16 155 72 Q160 115 130 142 Q110 165 100 178 Q90 165 70 142 Q40 115 45 72 Q50 16 100 16Z" fill="url(#g3b)"/></svg>
+      </div>
+    </div>
+    <div class="option-details">
+      <span class="tag good">Cuenta una historia</span>
+      <span class="tag good">Único en la industria</span>
+      <span class="tag">Ruta + destino</span>
+      <span class="tag warn">Detalles se pierden a 16px</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- VEREDICTO -->
+<div class="verdict">
+  <h2>🎯 Recomendación</h2>
+  <p style="margin-bottom:1rem;">
+    La <strong>Opción 1 (Pin Geométrico)</strong> tiene la mejor combinación de:
+  </p>
+  <ul style="margin-left:1.5rem;color:rgba(255,255,255,0.8);">
+    <li>Reconocible a cualquier tamaño (hasta 16px favicon)</li>
+    <li>Funciona sin texto — como la U de Uber</li>
+    <li>Angular = moderno, premium, tecnológico</li>
+    <li>2 colores justos, sin ruido visual</li>
+    <li>Diferente a todos los competidores (ellos usan letras)</li>
+  </ul>
+  <div class="recommendation">
+    Propuesta: Opción 1 como ícono principal + Opción 3 como variante para Rutmy Drive (la ruta conecta con "drive")
+  </div>
+</div>
+
+<p style="margin-top:2rem;color:var(--stone);font-size:0.85rem;text-align:center;">
+Estudio generado para Andres · Rutmy · Junio 2026<br>
+Archivos SVG editables en <code>docs/brand/logo-estudio/</code>
+</p>
+
+</div>
+</body>
+</html>

@@ -57,3 +57,6 @@ ios/.symlinks/
 # *.md
 
 !.cursorrules
+# --- Backups locales de edición ---
+*.bak
+*.bak-*

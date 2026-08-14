@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     }
 
     const response = await fetch(
-      'https://cmuhwyxmluhnlzcasceq.supabase.co/functions/v1/enviar-bienvenida',
+      'https://TU_PROYECTO.supabase.co/functions/v1/enviar-bienvenida',
       {
         method: 'POST',
         headers: {

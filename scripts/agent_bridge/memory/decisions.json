@@ -1,0 +1,35 @@
+{
+  "decisiones": [
+    {
+      "fecha": "2026-08-13",
+      "tema": "Docker en ZimaOS",
+      "decision": "Docker NO funciona en ZimaOS (seccomp activo, sin CAP_SYS_ADMIN, sin /dev/fuse, unshare EPERM). Los servicios corren NATIVOS en ZimaOS; Docker solo en Oracle.",
+      "evidencia": "unshare --mount → EPERM; CapEff sin CAP_SYS_ADMIN; repositories.json vacío",
+      "fuente": "Andres / Hermes"
+    },
+    {
+      "fecha": "2026-08-13",
+      "tema": "Geocodificación self-hosted",
+      "decision": "Nominatim (OpenStreetMap) desplegado en Oracle :7070 (Argentina). Acceso vía SSH tunnel ZimaOS:7070→Oracle:7070. Ruta pública: rutmy.com/geocoding vía Caddy.",
+      "fuente": "Andres / Hermes"
+    },
+    {
+      "fecha": "2026-08-13",
+      "tema": "Contraste de botones verde agua",
+      "decision": "Texto sobre botón verde agua #64DEB2 SIEMPRE oscuro #0F172A (10.74:1). NUNCA blanco (1.66:1, falla WCAG). Texto/links sobre claro → #0E7C5E (5.17:1).",
+      "fuente": "Auditoría Luna + verificación matemática propia"
+    },
+    {
+      "fecha": "2026-08-13",
+      "tema": "H3 multiservicio",
+      "decision": "Hexágonos H3 resolución 8 exclusivos de la PWA (no Flutter). Capas independientes por servicio con servicio_id en Supabase. Pincel de selección múltiple para administradores.",
+      "fuente": "Andres / Hermes"
+    },
+    {
+      "fecha": "2026-08-13",
+      "tema": "Purga Mapbox/Firebase",
+      "decision": "Mapas 100% self-hosted (MapLibre + Valhalla + PMTiles). Push vía Supabase Realtime. Cero dependencias Mapbox/Firebase.",
+      "fuente": "Andres"
+    }
+  ]
+}

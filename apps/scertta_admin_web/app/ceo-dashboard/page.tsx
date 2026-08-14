@@ -1,5 +1,5 @@
-import CeoDashboardShell from "./CeoDashboardShell";
+import GerenteDashboardShell from "./GerenteDashboardShell";
 
 export default function CeoDashboardPage() {
-  return <CeoDashboardShell />;
+  return <GerenteDashboardShell />;
 }

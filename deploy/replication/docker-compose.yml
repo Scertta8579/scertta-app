@@ -1,0 +1,66 @@
+# =============================================================================
+# Scertta/Rutmy — Replicación Híbrida Local ↔ Supabase Cloud
+# PostgreSQL 17 · Logical Replication · Multi-Region Active-Passive
+# =============================================================================
+
+services:
+  rutmy-local-pg:
+    image: postgres:17-alpine
+    container_name: rutmy-local-pg
+    restart: unless-stopped
+    network_mode: host  # ZimaOS requiere host networking
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${LOCAL_PG_PASSWORD:-RutmyLocal2026!}
+      POSTGRES_DB: postgres
+    volumes:
+      # Persistent data
+      - ./pgdata:/var/lib/postgresql/data
+      # Custom config
+      - ./pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+      - ./postgresql.conf:/etc/postgresql/postgresql.conf:ro
+      # Init scripts (run on first start)
+      - ./init/:/docker-entrypoint-initdb.d/:ro
+    command: >
+      postgres
+      -c config_file=/etc/postgresql/postgresql.conf
+      -c hba_file=/etc/postgresql/pg_hba.conf
+      -c wal_level=logical
+      -c max_replication_slots=5
+      -c max_wal_senders=5
+      -c max_wal_size=2GB
+      -c shared_buffers=512MB
+      -c effective_cache_size=1GB
+      -c listen_addresses='*'
+      -c port=5433
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -p 5433"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 2GB
+        reservations:
+          memory: 512MB
+
+  # ── Optional: PgBouncer for connection pooling ──
+  rutmy-pgbouncer:
+    image: edoburu/pgbouncer:latest
+    container_name: rutmy-pgbouncer
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      DB_USER: postgres
+      DB_PASSWORD: ${LOCAL_PG_PASSWORD:-RutmyLocal2026!}
+      DB_HOST: localhost
+      DB_PORT: 5433
+      DB_NAME: postgres
+      POOL_MODE: transaction
+      MAX_CLIENT_CONN: 100
+      DEFAULT_POOL_SIZE: 25
+      LISTEN_PORT: 6432
+    depends_on:
+      rutmy-local-pg:
+        condition: service_healthy

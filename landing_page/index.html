@@ -3,1351 +3,520 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="S-Route by Scertta — Transporte privado seguro en Argentina. Conductores validados, PIN de viaje y biometría para que llegues tranquilo." />
-  <meta name="theme-color" content="#0A1628" />
-  <title>S-Route — Viajá seguro</title>
+  <meta name="description" content="Scertta — Plataforma empresarial de movilidad. Infraestructura para franquicias Rutmy. Portal corporativo y descargas." />
+  <meta name="theme-color" content="#0F172A" />
+  <title>Scertta — Portal Corporativo</title>
 
-  <!-- Favicon (inline SVG data URI — single-file deploy, no external assets needed) -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='32' height='32' rx='6' fill='%230A1628'/%3E%3Ccircle cx='6' cy='16' r='4' fill='%2300C896'/%3E%3Cpath d='M10 16 C13 9%2C 19 9%2C 20 16 C21 23%2C 27 23%2C 30 16' stroke='%2300C896' stroke-width='2.2' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='30' cy='16' r='2.5' fill='%2300C896' fill-opacity='0.6'/%3E%3C/svg%3E" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='32' height='32' rx='6' fill='%230F172A'/%3E%3Ccircle cx='6' cy='16' r='4' fill='%23D4A017'/%3E%3Cpath d='M10 16 C13 9, 19 9, 20 16 C21 23, 27 23, 30 16' stroke='%23D4A017' stroke-width='2.2' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='30' cy='16' r='2.5' fill='%23D4A017' fill-opacity='0.6'/%3E%3C/svg%3E" />
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="S-Route — Viajá seguro" />
-  <meta property="og:description" content="Transporte privado con conductores validados, PIN de viaje y tecnología biométrica." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://scertta.com" />
-
-  <!-- Inter font -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
   <style>
-    /* ─── Reset & Variables ─── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --navy:       #0A1628;
-      --navy-mid:   #0F2040;
+      --navy:       #0F172A;
       --navy-light: #162B4D;
-      --teal:       #00C896;
-      --teal-dim:   #009E78;
+      --navy-card:  #1E3A5F;
+      --gold:       #D4A017;
+      --gold-dim:   #B8860B;
+      --cyan:       #0891B2;
       --white:      #FFFFFF;
       --white-80:   rgba(255,255,255,0.80);
-      --white-50:   rgba(255,255,255,0.50);
+      --white-60:   rgba(255,255,255,0.60);
+      --white-40:   rgba(255,255,255,0.40);
       --white-10:   rgba(255,255,255,0.10);
-      --white-05:   rgba(255,255,255,0.05);
-      --radius:     14px;
-      --radius-sm:  8px;
-      --shadow:     0 4px 32px rgba(0,0,0,0.40);
+      --success:    #059669;
+      --radius:     16px;
+      --radius-sm:  10px;
+      --shadow:     0 4px 32px rgba(0,0,0,0.50);
       --font:       'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
-
     html { scroll-behavior: smooth; }
-
     body {
       font-family: var(--font);
       background: var(--navy);
       color: var(--white);
-      line-height: 1.6;
+      line-height: 1.7;
       -webkit-font-smoothing: antialiased;
     }
-
     img { display: block; max-width: 100%; }
     a { color: inherit; text-decoration: none; }
 
-    /* ─── Utility ─── */
-    .container {
-      width: 100%;
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
-
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      background: var(--teal);
-      color: var(--navy);
-      font-weight: 700;
-      font-size: 1rem;
-      padding: 14px 32px;
-      border-radius: 50px;
-      border: none;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-      text-decoration: none;
-      white-space: nowrap;
-    }
-    .btn-primary:hover { background: var(--teal-dim); transform: translateY(-1px); }
-    .btn-primary:active { transform: translateY(0); }
-
-    .btn-outline {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      background: transparent;
-      color: var(--white);
-      font-weight: 600;
-      font-size: 1rem;
-      padding: 13px 28px;
-      border-radius: 50px;
-      border: 2px solid var(--white-50);
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-      text-decoration: none;
-      white-space: nowrap;
-    }
-    .btn-outline:hover { border-color: var(--teal); color: var(--teal); }
-
-    .section-label {
-      display: inline-block;
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--teal);
-      margin-bottom: 12px;
-    }
-
-    .section-title {
-      font-size: clamp(1.75rem, 5vw, 2.75rem);
-      font-weight: 800;
-      line-height: 1.2;
-      letter-spacing: -0.02em;
-      color: var(--white);
-    }
-
-    .section-subtitle {
-      font-size: 1.1rem;
-      color: var(--white-80);
-      max-width: 600px;
-      margin-top: 16px;
-    }
-
-    /* ─── Nav ─── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      padding: 16px 0;
-      background: rgba(10, 22, 40, 0.90);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+    /* Header */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(15,23,42,0.92); backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--white-10);
     }
-
-    nav .container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    .header-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between; height: 64px;
     }
-
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 1.35rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      color: var(--white);
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em;
     }
-
-    .nav-logo svg { display: block; }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 32px;
-      list-style: none;
+    .logo-dot {
+      width: 28px; height: 28px; border-radius: 6px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-dim));
     }
-
-    .nav-links a {
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: var(--white-80);
-      transition: color 0.2s;
+    .logo-scertta { color: var(--white-60); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; }
+    nav { display: flex; gap: 32px; }
+    nav a {
+      font-size: 0.875rem; font-weight: 500; color: var(--white-60);
+      transition: color 0.2s; padding: 8px 0;
     }
-    .nav-links a:hover { color: var(--teal); }
+    nav a:hover { color: var(--white); }
 
-    .nav-cta { display: flex; gap: 12px; align-items: center; }
+    /* Sections */
+    section { padding: 100px 24px 80px; }
+    .container { max-width: 1100px; margin: 0 auto; }
 
-    .hamburger {
-      display: none;
-      flex-direction: column;
-      gap: 5px;
-      cursor: pointer;
-      background: none;
-      border: none;
-      padding: 4px;
+    /* Hero */
+    .hero {
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+      padding-top: 160px; padding-bottom: 100px;
     }
-    .hamburger span {
-      width: 24px; height: 2px;
-      background: var(--white);
-      border-radius: 2px;
-      transition: transform 0.3s, opacity 0.3s;
-    }
-
-    /* ─── Hero ─── */
-    #hero {
-      min-height: 100svh;
-      padding: 120px 0 80px;
-      display: flex;
-      align-items: center;
-      background:
-        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,200,150,0.10) 0%, transparent 70%),
-        var(--navy);
-      position: relative;
-      overflow: hidden;
-    }
-
-    #hero::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 120px;
-      background: linear-gradient(to top, var(--navy), transparent);
-      pointer-events: none;
-    }
-
-    .hero-inner {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 48px;
-      align-items: center;
-    }
-
     .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--white-05);
-      border: 1px solid var(--white-10);
-      border-radius: 50px;
-      padding: 6px 14px 6px 8px;
-      font-size: 0.8rem;
-      color: var(--teal);
-      font-weight: 600;
-      margin-bottom: 24px;
-    }
-    .hero-badge .dot-pulse {
-      width: 8px; height: 8px;
-      background: var(--teal);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.5; transform: scale(0.8); }
-    }
-
-    .hero-title {
-      font-size: clamp(2.4rem, 8vw, 4.2rem);
-      font-weight: 900;
-      line-height: 1.08;
-      letter-spacing: -0.03em;
-    }
-
-    .hero-title .highlight {
-      color: var(--teal);
-    }
-
-    .hero-subtitle {
-      font-size: 1.15rem;
-      color: var(--white-80);
-      margin: 20px 0 36px;
-      max-width: 520px;
-    }
-
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      align-items: center;
-    }
-
-    .hero-social-proof {
-      margin-top: 40px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 0.85rem;
-      color: var(--white-50);
-    }
-
-    .hero-avatars {
-      display: flex;
-    }
-    .hero-avatars span {
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      border: 2px solid var(--navy);
-      background: var(--navy-light);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.75rem;
-      font-weight: 700;
-      margin-right: -8px;
-      color: var(--teal);
-    }
-
-    .hero-graphic {
-      display: flex;
-      justify-content: center;
-    }
-
-    .phone-mockup {
-      width: 260px;
-      background: var(--navy-light);
-      border-radius: 36px;
-      padding: 16px;
-      box-shadow: var(--shadow), 0 0 80px rgba(0,200,150,0.12);
-      border: 1px solid var(--white-10);
-      position: relative;
-    }
-
-    .phone-screen {
-      background: var(--navy-mid);
-      border-radius: 24px;
-      padding: 20px 16px;
-      min-height: 420px;
-    }
-
-    .phone-status {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.7rem;
-      color: var(--white-50);
-      margin-bottom: 16px;
-    }
-
-    .trip-card {
-      background: var(--navy-light);
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 12px;
-      border: 1px solid var(--white-10);
-    }
-
-    .trip-card .trip-label {
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--teal);
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-
-    .trip-card .trip-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.8rem;
-    }
-
-    .trip-card .trip-row .val {
-      font-weight: 700;
-      font-size: 1rem;
-      letter-spacing: 4px;
-      color: var(--white);
-      background: var(--navy);
-      padding: 6px 10px;
-      border-radius: 8px;
-    }
-
-    .driver-card {
-      background: linear-gradient(135deg, var(--teal) 0%, #00A07A 100%);
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .driver-avatar {
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-    }
-
-    .driver-info { flex: 1; }
-    .driver-name {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: var(--navy);
-    }
-    .driver-meta {
-      font-size: 0.72rem;
-      color: rgba(10,22,40,0.7);
-      margin-top: 2px;
-    }
-
-    .driver-badge {
-      background: rgba(10,22,40,0.15);
-      border-radius: 8px;
-      padding: 4px 8px;
-      font-size: 0.65rem;
-      font-weight: 700;
-      color: var(--navy);
-    }
-
-    .status-bar {
-      background: var(--navy-light);
-      border-radius: 10px;
-      padding: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.75rem;
-    }
-    .status-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--teal);
-      display: inline-block;
-      margin-right: 5px;
-    }
-    .status-text { color: var(--teal); font-weight: 600; }
-    .eta { color: var(--white-50); }
-
-    /* ─── Stats ─── */
-    #stats {
-      padding: 60px 0;
-      border-top: 1px solid var(--white-10);
-      border-bottom: 1px solid var(--white-10);
-      background: var(--white-05);
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 32px;
-    }
-
-    .stat-item { text-align: center; }
-    .stat-number {
-      font-size: clamp(1.8rem, 5vw, 2.8rem);
-      font-weight: 900;
-      color: var(--teal);
-      letter-spacing: -0.03em;
-    }
-    .stat-label {
-      font-size: 0.85rem;
-      color: var(--white-50);
-      margin-top: 4px;
-    }
-
-    /* ─── How it works ─── */
-    #como-funciona {
-      padding: 100px 0;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 0;
-      background: var(--white-05);
-      border: 1px solid var(--white-10);
-      border-radius: 50px;
-      padding: 4px;
-      margin: 32px 0 48px;
-      max-width: 360px;
-    }
-
-    .tab {
-      flex: 1;
-      text-align: center;
-      padding: 10px 16px;
-      border-radius: 50px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: var(--white-50);
-      transition: all 0.2s;
-      border: none;
-      background: none;
-    }
-
-    .tab.active {
-      background: var(--teal);
-      color: var(--navy);
-    }
-
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
-
-    .steps {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 20px;
-    }
-
-    .step {
-      display: flex;
-      gap: 20px;
-      align-items: flex-start;
-      background: var(--white-05);
-      border: 1px solid var(--white-10);
-      border-radius: var(--radius);
-      padding: 24px;
-      transition: border-color 0.2s;
-    }
-    .step:hover { border-color: var(--teal); }
-
-    .step-num {
-      min-width: 40px; height: 40px;
-      border-radius: 50%;
-      background: var(--teal);
-      color: var(--navy);
-      font-weight: 800;
-      font-size: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .step-body h3 {
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .step-body p {
-      font-size: 0.9rem;
-      color: var(--white-80);
-      line-height: 1.5;
-    }
-
-    /* ─── Security ─── */
-    #seguridad {
-      padding: 100px 0;
-      background:
-        radial-gradient(ellipse 70% 50% at 50% 50%, rgba(0,200,150,0.06) 0%, transparent 70%),
-        var(--navy-mid);
-    }
-
-    .security-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-      margin-top: 48px;
-    }
-
-    .security-card {
-      background: var(--white-05);
-      border: 1px solid var(--white-10);
-      border-radius: var(--radius);
-      padding: 28px;
-      position: relative;
-      overflow: hidden;
-      transition: border-color 0.2s;
-    }
-    .security-card:hover { border-color: var(--teal); }
-
-    .security-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 4px;
-      height: 100%;
-      background: var(--teal);
-      border-radius: 0 0 0 0;
-    }
-
-    .security-icon {
-      font-size: 2rem;
-      margin-bottom: 16px;
-    }
-
-    .security-card h3 {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .security-card p {
-      font-size: 0.9rem;
-      color: var(--white-80);
-      line-height: 1.55;
-    }
-
-    .security-tag {
-      display: inline-block;
-      margin-top: 12px;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--teal);
-      background: rgba(0,200,150,0.1);
-      border: 1px solid rgba(0,200,150,0.25);
-      padding: 3px 10px;
-      border-radius: 50px;
-    }
-
-    /* ─── Mission ─── */
-    #nosotros {
-      padding: 100px 0;
-    }
-
-    .mission-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 48px;
-      align-items: center;
-    }
-
-    .mission-text { max-width: 560px; }
-
-    .mission-text p {
-      font-size: 1rem;
-      color: var(--white-80);
-      line-height: 1.7;
-      margin-top: 20px;
-    }
-
-    .mission-values {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-top: 36px;
-    }
-
-    .value-pill {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--white-05);
-      border: 1px solid var(--white-10);
-      border-radius: 10px;
-      padding: 12px 16px;
-      font-size: 0.85rem;
-      font-weight: 600;
-    }
-
-    .value-pill .icon { font-size: 1.1rem; }
-
-    .timeline {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-      position: relative;
-      padding-left: 24px;
-    }
-
-    .timeline::before {
-      content: '';
-      position: absolute;
-      left: 7px; top: 8px; bottom: 8px;
-      width: 2px;
-      background: linear-gradient(to bottom, var(--teal), transparent);
-    }
-
-    .timeline-item {
-      position: relative;
-      padding-bottom: 28px;
-    }
-
-    .timeline-item::before {
-      content: '';
-      position: absolute;
-      left: -20px; top: 6px;
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      background: var(--teal);
-      border: 2px solid var(--navy);
-    }
-
-    .timeline-item:last-child { padding-bottom: 0; }
-
-    .timeline-date {
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--teal);
-      margin-bottom: 4px;
-    }
-
-    .timeline-item h4 {
-      font-size: 0.95rem;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-
-    .timeline-item p {
-      font-size: 0.85rem;
-      color: var(--white-50);
-    }
-
-    /* ─── Waitlist ─── */
-    #lista-espera {
-      padding: 100px 0;
-      background:
-        radial-gradient(ellipse 80% 60% at 50% 100%, rgba(0,200,150,0.08) 0%, transparent 70%),
-        var(--navy-mid);
-    }
-
-    .waitlist-box {
-      max-width: 560px;
-      margin: 0 auto;
-      text-align: center;
-    }
-
-    .waitlist-box .section-subtitle {
-      margin: 16px auto 40px;
-    }
-
-    .waitlist-form {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .form-row {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .input-group {
-      position: relative;
-    }
-
-    .input-group input,
-    .input-group select {
-      width: 100%;
-      background: var(--white-05);
-      border: 1px solid var(--white-10);
-      border-radius: var(--radius-sm);
-      padding: 14px 16px;
-      color: var(--white);
-      font-size: 1rem;
-      font-family: var(--font);
-      outline: none;
-      transition: border-color 0.2s;
-      -webkit-appearance: none;
-    }
-
-    .input-group input::placeholder { color: var(--white-50); }
-    .input-group input:focus,
-    .input-group select:focus { border-color: var(--teal); }
-
-    .input-group select option {
-      background: var(--navy-mid);
-      color: var(--white);
-    }
-
-    .waitlist-form .btn-primary {
-      width: 100%;
-      font-size: 1.05rem;
-      padding: 16px;
-    }
-
-    .form-note {
-      font-size: 0.78rem;
-      color: var(--white-50);
-      margin-top: 8px;
-    }
-
-    /* ─── Footer ─── */
-    footer {
-      padding: 60px 0 40px;
-      border-top: 1px solid var(--white-10);
-    }
-
-    .footer-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 40px;
-      margin-bottom: 48px;
-    }
-
-    .footer-brand .nav-logo { margin-bottom: 12px; }
-    .footer-brand p {
-      font-size: 0.85rem;
-      color: var(--white-50);
-      line-height: 1.6;
-      max-width: 280px;
-    }
-
-    .footer-links h4 {
-      font-size: 0.8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--white-50);
-      margin-bottom: 16px;
-    }
-
-    .footer-links ul {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .footer-links a {
-      font-size: 0.9rem;
-      color: var(--white-80);
-      transition: color 0.2s;
-    }
-    .footer-links a:hover { color: var(--teal); }
-
-    .footer-bottom {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      align-items: center;
-      text-align: center;
-      padding-top: 32px;
-      border-top: 1px solid var(--white-10);
-      font-size: 0.8rem;
-      color: var(--white-50);
-    }
-
-    .footer-legal { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
-    .footer-legal a:hover { color: var(--teal); }
-
-    /* ─── Responsive ─── */
-    @media (min-width: 600px) {
-      .stats-grid { grid-template-columns: repeat(4, 1fr); }
-      .form-row { flex-direction: row; }
-      .security-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    @media (min-width: 860px) {
-      .hero-inner {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .steps { grid-template-columns: repeat(2, 1fr); }
-
-      .security-grid { grid-template-columns: repeat(3, 1fr); }
-
-      .mission-grid { grid-template-columns: 1fr 1fr; }
-
-      .footer-grid { grid-template-columns: 2fr 1fr 1fr 1fr; }
-
-      .footer-bottom { flex-direction: row; justify-content: space-between; text-align: left; }
-    }
-
-    @media (max-width: 860px) {
-      .nav-links, .nav-cta .btn-outline { display: none; }
-      .hamburger { display: flex; }
-    }
-
-    /* ─── Mobile menu ─── */
-    .mobile-menu {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: var(--navy);
-      z-index: 200;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 32px;
-    }
-
-    .mobile-menu.open { display: flex; }
-
-    .mobile-menu a {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--white);
-      transition: color 0.2s;
-    }
-    .mobile-menu a:hover { color: var(--teal); }
-
-    .mobile-close {
-      position: absolute;
-      top: 20px; right: 20px;
-      background: none;
-      border: none;
-      color: var(--white);
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 16px; border-radius: 100px;
+      background: var(--white-10); border: 1px solid var(--white-10);
+      font-size: 0.8rem; font-weight: 500; color: var(--gold); margin-bottom: 24px;
+    }
+    .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .hero h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 20px; }
+    .hero h1 .gold { color: var(--gold); }
+    .hero p { font-size: 1.1rem; color: var(--white-60); max-width: 600px; margin-bottom: 40px; }
+    .hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 28px; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.95rem;
+      border: none; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-primary { background: var(--gold); color: var(--navy); }
+    .btn-primary:hover { background: var(--gold-dim); }
+    .btn-secondary { background: var(--white-10); color: var(--white); border: 1px solid var(--white-10); }
+    .btn-secondary:hover { background: var(--white-10); border-color: var(--white-40); }
+
+    /* Stats */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 24px; padding: 60px 24px 0; max-width: 1100px; margin: 0 auto; text-align: center; }
+    .stat-card { padding: 28px; background: var(--navy-card); border-radius: var(--radius); border: 1px solid var(--white-10); }
+    .stat-value { font-size: 2rem; font-weight: 800; color: var(--gold); letter-spacing: -0.02em; }
+    .stat-label { font-size: 0.85rem; color: var(--white-60); margin-top: 4px; }
+
+    /* Section titles */
+    .section-title { text-align: center; margin-bottom: 48px; }
+    .section-title h2 { font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 12px; }
+    .section-title p { color: var(--white-60); font-size: 1rem; }
+
+    /* Plataforma */
+    .platform-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+    .platform-card {
+      padding: 32px; background: var(--navy-card); border-radius: var(--radius);
+      border: 1px solid var(--white-10); transition: border-color 0.3s;
+    }
+    .platform-card:hover { border-color: var(--gold); }
+    .platform-card .icon {
+      width: 48px; height: 48px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; margin-bottom: 20px;
+    }
+    .icon-gold { background: rgba(212,160,23,0.15); }
+    .icon-cyan { background: rgba(8,145,178,0.15); }
+    .platform-card h3 { font-size: 1.15rem; font-weight: 600; margin-bottom: 8px; }
+    .platform-card p { color: var(--white-60); font-size: 0.9rem; }
+    .platform-card .tag {
+      display: inline-block; margin-top: 12px; padding: 2px 10px;
+      border-radius: 100px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .tag-gold { background: rgba(212,160,23,0.12); color: var(--gold); }
+    .tag-cyan { background: rgba(8,145,178,0.12); color: var(--cyan); }
+
+    /* Downloads */
+    .downloads-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; max-width: 900px; margin: 0 auto; }
+    .download-card {
+      padding: 32px; background: var(--navy-card); border-radius: var(--radius);
+      border: 1px solid var(--white-10); text-align: center; transition: all 0.3s;
+    }
+    .download-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+    .download-card.featured { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
+    .download-icon {
+      width: 64px; height: 64px; border-radius: 16px;
+      margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;
       font-size: 1.8rem;
-      cursor: pointer;
-      padding: 8px;
     }
+    .download-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+    .download-card .subtitle { font-size: 0.8rem; color: var(--white-60); margin-bottom: 16px; }
+    .download-card .meta {
+      display: flex; justify-content: center; gap: 12px; margin-bottom: 20px;
+      font-size: 0.8rem; color: var(--white-40);
+    }
+    .download-card .meta span { display: flex; align-items: center; gap: 4px; }
+    .download-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 14px; border-radius: var(--radius-sm);
+      font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.2s;
+      background: var(--gold); color: var(--navy); border: none;
+    }
+    .download-btn:hover { background: var(--gold-dim); }
+    .download-btn.outline {
+      background: transparent; color: var(--white); border: 2px solid var(--white-40);
+    }
+    .download-btn.outline:hover { border-color: var(--white); }
 
-    /* ─── Scroll fade-in ─── */
-    .fade-in {
-      opacity: 0;
-      transform: translateY(24px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
+    /* Flujos de negocio */
+    .flows-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    @media (max-width: 768px) { .flows-grid { grid-template-columns: 1fr; } }
+    .flow-card {
+      padding: 32px; background: var(--navy-card); border-radius: var(--radius);
+      border: 1px solid var(--white-10); position: relative; overflow: hidden;
     }
-    .fade-in.visible {
-      opacity: 1;
-      transform: none;
+    .flow-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    }
+    .flow-card.flujo1::before { background: var(--gold); }
+    .flow-card.flujo2::before { background: var(--cyan); }
+    .flow-card.flujo3::before { background: var(--success); }
+    .flow-card .flow-num {
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+    .flujo1 .flow-num { color: var(--gold); }
+    .flujo2 .flow-num { color: var(--cyan); }
+    .flujo3 .flow-num { color: var(--success); }
+    .flow-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+    .flow-card p { color: var(--white-60); font-size: 0.88rem; margin-bottom: 16px; }
+    .flow-spec { list-style: none; }
+    .flow-spec li {
+      font-size: 0.82rem; color: var(--white-60); padding: 6px 0;
+      border-bottom: 1px solid var(--white-05); display: flex; justify-content: space-between;
+    }
+    .flow-spec li .val { color: var(--white-80); font-weight: 500; }
+
+    /* Franquicias */
+    .franquicia-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+    .franquicia-stat { padding: 24px; background: var(--navy-card); border-radius: var(--radius); border: 1px solid var(--white-10); text-align: center; }
+    .franquicia-stat .val { font-size: 1.6rem; font-weight: 700; color: var(--gold); }
+    .franquicia-stat .lbl { font-size: 0.82rem; color: var(--white-60); margin-top: 4px; }
+
+    /* Tech */
+    .tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+    .tech-card {
+      padding: 24px; background: var(--navy-card); border-radius: var(--radius);
+      border: 1px solid var(--white-10);
+    }
+    .tech-card h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; }
+    .tech-card p { color: var(--white-60); font-size: 0.85rem; }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--white-10); padding: 48px 24px 32px;
+    }
+    .footer-inner { max-width: 1100px; margin: 0 auto; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; }
+    @media (max-width: 768px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+    .footer-col h4 { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--white-40); margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { font-size: 0.85rem; color: var(--white-60); transition: color 0.2s; }
+    .footer-col a:hover { color: var(--white); }
+    .footer-brand { font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; }
+    .footer-brand p { color: var(--white-40); font-size: 0.85rem; }
+    .footer-bottom {
+      margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--white-10);
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.82rem; color: var(--white-40); flex-wrap: wrap; gap: 12px;
+    }
+    .footer-bottom a { color: var(--white-60); }
+
+    /* Build info */
+    .build-info {
+      display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px;
+      border-radius: 100px; background: var(--white-05); font-size: 0.7rem; color: var(--white-40);
+    }
+    .build-info .status { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      nav { display: none; }
+      .hero h1 { font-size: 1.8rem; }
+      section { padding: 60px 16px 40px; }
+      .hero { padding-top: 120px; }
     }
   </style>
 </head>
 <body>
 
-<!-- ══ Nav ══════════════════════════════════════════════ -->
-<nav>
-  <div class="container">
-    <a href="#" class="nav-logo">
-      <svg width="130" height="28" viewBox="0 0 130 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="S-Route" role="img">
-        <circle cx="7" cy="14" r="4.5" fill="#00C896"/>
-        <path d="M11.5 14 C16 6,22 6,24 14 C26 22,32 22,36.5 14" stroke="#00C896" stroke-width="2" stroke-linecap="round" fill="none"/>
-        <circle cx="36.5" cy="14" r="3" fill="#00C896" fill-opacity="0.65"/>
-        <text x="46" y="19.5" font-family="Inter,system-ui,-apple-system,sans-serif" font-size="15" font-weight="800" letter-spacing="-0.4" fill="#FFFFFF">S-Route</text>
-      </svg>
-    </a>
-    <ul class="nav-links">
-      <li><a href="#como-funciona">Cómo funciona</a></li>
-      <li><a href="#seguridad">Seguridad</a></li>
-      <li><a href="#nosotros">Nosotros</a></li>
-    </ul>
-    <div class="nav-cta">
-      <a href="#lista-espera" class="btn-outline" style="padding:10px 20px;font-size:0.9rem;">Contacto</a>
-      <a href="#lista-espera" class="btn-primary" style="padding:10px 20px;font-size:0.9rem;">Quiero acceso anticipado</a>
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-dot"></div>
+      <div>
+        <span>Scertta</span>
+        <div class="logo-scertta">Plataforma empresarial</div>
+      </div>
     </div>
-    <button class="hamburger" aria-label="Menú" onclick="document.getElementById('mobileMenu').classList.add('open')">
-      <span></span><span></span><span></span>
-    </button>
+    <nav>
+      <a href="#plataforma">Plataforma</a>
+      <a href="#flujos">Flujos de negocio</a>
+      <a href="#descargas">Descargas</a>
+      <a href="#infraestructura">Infraestructura</a>
+    </nav>
   </div>
-</nav>
+</header>
 
-<!-- Mobile Menu -->
-<div class="mobile-menu" id="mobileMenu">
-  <button class="mobile-close" aria-label="Cerrar" onclick="document.getElementById('mobileMenu').classList.remove('open')">✕</button>
-  <svg width="120" height="26" viewBox="0 0 130 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="S-Route" role="img" style="margin-bottom:8px;">
-    <circle cx="7" cy="14" r="4.5" fill="#00C896"/>
-    <path d="M11.5 14 C16 6,22 6,24 14 C26 22,32 22,36.5 14" stroke="#00C896" stroke-width="2" stroke-linecap="round" fill="none"/>
-    <circle cx="36.5" cy="14" r="3" fill="#00C896" fill-opacity="0.65"/>
-    <text x="46" y="19.5" font-family="Inter,system-ui,-apple-system,sans-serif" font-size="15" font-weight="800" letter-spacing="-0.4" fill="#FFFFFF">S-Route</text>
-  </svg>
-  <a href="#como-funciona" onclick="document.getElementById('mobileMenu').classList.remove('open')">Cómo funciona</a>
-  <a href="#seguridad" onclick="document.getElementById('mobileMenu').classList.remove('open')">Seguridad</a>
-  <a href="#nosotros" onclick="document.getElementById('mobileMenu').classList.remove('open')">Nosotros</a>
-  <a href="#lista-espera" onclick="document.getElementById('mobileMenu').classList.remove('open')" class="btn-primary">Quiero acceso anticipado</a>
+<!-- Hero -->
+<section class="hero" id="inicio">
+  <div class="hero-badge">
+    <span class="dot"></span> Infraestructura híbrida activa · Build 23-jun-2026
+  </div>
+  <h1>El motor de <span class="gold">Rutmy</span></h1>
+  <p>Scertta es la plataforma empresarial que potencia a las franquicias Rutmy. Infraestructura multi-provincia, facturación ARCA, failover híbrido y control total para gerentes de flota.</p>
+  <div class="hero-buttons">
+    <a href="#descargas" class="btn btn-primary">📱 Descargar apps</a>
+    <a href="#flujos" class="btn btn-secondary">Ver plataforma →</a>
+  </div>
+</section>
+
+<!-- Stats -->
+<div class="stats">
+  <div class="stat-card">
+    <div class="stat-value">3</div>
+    <div class="stat-label">Flujos de negocio</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">24</div>
+    <div class="stat-label">Provincias</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">99.7%</div>
+    <div class="stat-label">Uptime infraestructura</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">&lt;2ms</div>
+    <div class="stat-label">Latencia local (failover)</div>
+  </div>
 </div>
 
-<!-- ══ Hero ══════════════════════════════════════════════ -->
-<section id="hero">
+<!-- Plataforma -->
+<section id="plataforma">
   <div class="container">
-    <div class="hero-inner">
-      <div class="hero-content">
-        <div class="hero-badge">
-          <span class="dot-pulse"></span>
-          S-Route · Acceso anticipado disponible
-        </div>
-        <h1 class="hero-title">
-          El transporte<br/>
-          privado más<br/>
-          <span class="highlight">seguro de CABA</span>
-        </h1>
-        <p class="hero-subtitle">
-          Cada conductor validado. Cada viaje protegido con PIN. Porque llegar bien no es un lujo, es un derecho.
-        </p>
-        <div class="hero-actions">
-          <a href="#lista-espera" class="btn-primary">
-            <span>Quiero viajar con Scertta</span>
-            <span>→</span>
-          </a>
-          <a href="#como-funciona" class="btn-outline">Ver cómo funciona</a>
-        </div>
-        <div class="hero-social-proof">
-          <div class="hero-avatars">
-            <span>M</span><span>J</span><span>A</span><span>R</span>
-          </div>
-          <span>Más de 200 personas ya en lista de espera</span>
-        </div>
+    <div class="section-title">
+      <h2>Ecosistema de productos</h2>
+      <p>Tres aplicaciones conectadas a una única infraestructura empresarial</p>
+    </div>
+    <div class="platform-grid">
+      <div class="platform-card">
+        <div class="icon icon-gold">🧑</div>
+        <h3>Rutmy</h3>
+        <p>App para pasajeros. Viajes seguros con PIN, conductor validado, biometría y botón de pánico.</p>
+        <span class="tag tag-gold">Android · iOS</span>
       </div>
-      <div class="hero-graphic fade-in">
-        <div class="phone-mockup">
-          <div class="phone-screen">
-            <div class="phone-status">
-              <span>9:41</span>
-              <span>●●●</span>
-            </div>
-            <div class="trip-card">
-              <div class="trip-label">PIN de viaje</div>
-              <div class="trip-row">
-                <span style="font-size:0.8rem;color:var(--white-80)">Tu código seguro</span>
-                <span class="val">4738</span>
-              </div>
-            </div>
-            <div class="driver-card">
-              <div class="driver-avatar">🧑</div>
-              <div class="driver-info">
-                <div class="driver-name">Carlos M.</div>
-                <div class="driver-meta">⭐ 4.97 · 1,234 viajes</div>
-              </div>
-              <div class="driver-badge">✓ Validado</div>
-            </div>
-            <div class="status-bar">
-              <span>
-                <span class="status-dot"></span>
-                <span class="status-text">En camino</span>
-              </span>
-              <span class="eta">ETA: 3 min</span>
-            </div>
-          </div>
-        </div>
+      <div class="platform-card">
+        <div class="icon icon-gold">🚗</div>
+        <h3>Rutmy Drive</h3>
+        <p>App para conductores independientes. Navegación, reportes rápidos, liquidación semanal.</p>
+        <span class="tag tag-gold">Android · iOS</span>
+      </div>
+      <div class="platform-card">
+        <div class="icon icon-cyan">🏢</div>
+        <h3>Flota Rutmy</h3>
+        <p>Portal para empresas con flota propia. API de consumo B2B, despacho y conciliación ARCA.</p>
+        <span class="tag tag-cyan">Web · API</span>
+      </div>
+      <div class="platform-card">
+        <div class="icon icon-cyan">📊</div>
+        <h3>Dashboard Gerente</h3>
+        <p>Panel de control para franquicias. 12 pestañas: flota, despacho, valores regulables, ARCA y más.</p>
+        <span class="tag tag-cyan">Web · CEO</span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══ Stats ══════════════════════════════════════════════ -->
-<section id="stats">
+<!-- Flujos de negocio -->
+<section id="flujos">
   <div class="container">
-    <div class="stats-grid fade-in">
-      <div class="stat-item">
-        <div class="stat-number">100%</div>
-        <div class="stat-label">Conductores validados con documentación</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number">PIN</div>
-        <div class="stat-label">Único por viaje para máxima seguridad</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number">0 $</div>
-        <div class="stat-label">Sin cargos ocultos ni comisiones al pasajero</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number">CABA</div>
-        <div class="stat-label">Ciudad Autónoma de Buenos Aires · AMBA</div>
-      </div>
+    <div class="section-title">
+      <h2>Flujos de negocio</h2>
+      <p>Arquitectura operativa de la plataforma Scertta</p>
     </div>
-  </div>
-</section>
-
-<!-- ══ Cómo funciona ══════════════════════════════════════ -->
-<section id="como-funciona">
-  <div class="container">
-    <span class="section-label fade-in">Cómo funciona</span>
-    <h2 class="section-title fade-in">Simple. Seguro. Sin sorpresas.</h2>
-    <p class="section-subtitle fade-in">Tanto si querés viajar como si querés trabajar como conductor, el proceso es claro y transparente.</p>
-
-    <div class="tabs">
-      <button class="tab active" onclick="switchTab(event,'riders')">Soy pasajero</button>
-      <button class="tab" onclick="switchTab(event,'drivers')">Soy conductor</button>
-    </div>
-
-    <!-- Rider -->
-    <div id="riders" class="tab-panel active">
-      <div class="steps">
-        <div class="step fade-in">
-          <div class="step-num">1</div>
-          <div class="step-body">
-            <h3>Creá tu cuenta</h3>
-            <p>Registrate con tu teléfono en segundos. Sin papeleos ni formularios interminables.</p>
-          </div>
-        </div>
-        <div class="step fade-in">
-          <div class="step-num">2</div>
-          <div class="step-body">
-            <h3>Pedí tu viaje</h3>
-            <p>Ingresá tu destino y confirmá. Te asignamos el conductor validado más cercano.</p>
-          </div>
-        </div>
-        <div class="step fade-in">
-          <div class="step-num">3</div>
-          <div class="step-body">
-            <h3>Verificá el PIN</h3>
-            <p>Antes de subir al vehículo, compartí tu PIN con el conductor para confirmar que es tu viaje asignado.</p>
-          </div>
-        </div>
-        <div class="step fade-in">
-          <div class="step-num">4</div>
-          <div class="step-body">
-            <h3>Llegá tranquilo</h3>
-            <p>Pagá en efectivo o Mercado Pago al llegar. Sin sorpresas en el precio.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Driver -->
-    <div id="drivers" class="tab-panel">
-      <div class="steps">
-        <div class="step fade-in">
-          <div class="step-num">1</div>
-          <div class="step-body">
-            <h3>Enviá tu documentación</h3>
-            <p>Subí tu DNI, Licencia de conducir y VTV. Nuestro sistema de IA verifica la autenticidad.</p>
-          </div>
-        </div>
-        <div class="step fade-in">
-          <div class="step-num">2</div>
-          <div class="step-body">
-            <h3>Validación humana</h3>
-            <p>Un miembro del equipo Scertta hace la revisión final y aprueba tu perfil manualmente.</p>
-          </div>
-        </div>
-        <div class="step fade-in">
-          <div class="step-num">3</div>
-          <div class="step-body">
-            <h3>Verificación biométrica</h3>
-            <p>Al inicio de cada jornada, confirmamos tu identidad con reconocimiento facial para proteger a todos.</p>
-          </div>
-        </div>
-        <div class="step fade-in">
-          <div class="step-num">4</div>
-          <div class="step-body">
-            <h3>Empezá a ganar</h3>
-            <p>Trabajá con plena flexibilidad. Las tarifas son transparentes y actualizadas para combatir la inflación.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ Seguridad ══════════════════════════════════════════ -->
-<section id="seguridad">
-  <div class="container">
-    <span class="section-label fade-in">Seguridad</span>
-    <h2 class="section-title fade-in">Tu seguridad no es una<br/>función. Es nuestra base.</h2>
-    <p class="section-subtitle fade-in">
-      Construimos Scertta desde cero pensando en qué tendría que pasar para que un viaje sea verdaderamente seguro. Esto es lo que implementamos.
-    </p>
-    <div class="security-grid">
-      <div class="security-card fade-in">
-        <div class="security-icon">🔐</div>
-        <h3>PIN de viaje único</h3>
-        <p>Cada viaje tiene un PIN único generado en el momento. El conductor debe ingresarlo para iniciar el trayecto, confirmando que es la persona asignada.</p>
-        <span class="security-tag">Activo en cada viaje</span>
-      </div>
-      <div class="security-card fade-in">
-        <div class="security-icon">📄</div>
-        <h3>Validación de documentos con IA</h3>
-        <p>Utilizamos inteligencia artificial para pre-auditar DNI, Licencias y VTV de todos los conductores. Verificamos autenticidad, vigencia y coherencia antes de aprobar.</p>
-        <span class="security-tag">IA + revisión humana</span>
-      </div>
-      <div class="security-card fade-in">
-        <div class="security-icon">👁️</div>
-        <h3>Biometría facial</h3>
-        <p>Antes de comenzar a trabajar, el conductor debe pasar por reconocimiento facial para confirmar que es quien dice ser. Sin atajos.</p>
-        <span class="security-tag">Próximamente</span>
-      </div>
-      <div class="security-card fade-in">
-        <div class="security-icon">✅</div>
-        <h3>Aprobación manual</h3>
-        <p>Ningún conductor se activa solo por pasar los filtros automáticos. Un humano del equipo Scertta da el visto bueno final antes de habilitar el perfil.</p>
-        <span class="security-tag">100% del equipo</span>
-      </div>
-      <div class="security-card fade-in">
-        <div class="security-icon">💵</div>
-        <h3>Pagos transparentes</h3>
-        <p>Solo Efectivo y Mercado Pago transferencia. El precio que ves es el precio que pagás. La comisión de Scertta es clara y se documenta en cada viaje.</p>
-        <span class="security-tag">Sin cargos ocultos</span>
-      </div>
-      <div class="security-card fade-in">
-        <div class="security-icon">📍</div>
-        <h3>Tarifas anti-inflación</h3>
-        <p>Las tarifas se actualizan en tiempo real desde nuestro panel. Sin necesidad de actualizar la app. Conductores y pasajeros siempre con precios justos y actualizados.</p>
-        <span class="security-tag">Tiempo real</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ Nosotros ══════════════════════════════════════════ -->
-<section id="nosotros">
-  <div class="container">
-    <div class="mission-grid">
-      <div class="mission-text fade-in">
-        <span class="section-label">Nuestro camino</span>
-        <h2 class="section-title">Nacimos porque el transporte en Argentina puede ser mejor</h2>
-        <p>
-          Scertta nació de una pregunta simple: ¿por qué confiar en un extraño para llegar a destino tiene que ser un acto de fe?
-        </p>
-        <p>
-          Somos un equipo porteño que vive la misma ciudad que vos. Que sabe lo que es llegar tarde, preocuparse por la ruta, o tener que compartir auto con alguien que no conocés. Construimos Scertta para resolver eso con tecnología real, no con promesas vacías.
-        </p>
-        <p>
-          Nuestra plataforma está construida sobre Flutter y Supabase, pensada para escalar desde CABA al interior del país manteniendo siempre el mismo estándar de seguridad.
-        </p>
-        <div class="mission-values">
-          <div class="value-pill"><span class="icon">🛡️</span> Seguridad real</div>
-          <div class="value-pill"><span class="icon">🤝</span> Transparencia total</div>
-          <div class="value-pill"><span class="icon">📍</span> Hecho en Argentina</div>
-          <div class="value-pill"><span class="icon">⚡</span> Tecnología local</div>
-        </div>
-      </div>
-      <div class="fade-in">
-        <div class="timeline">
-          <div class="timeline-item">
-            <div class="timeline-date">Origen</div>
-            <h4>La idea</h4>
-            <p>Una experiencia de viaje insegura da origen a la pregunta: ¿hay una forma mejor?</p>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-date">Desarrollo</div>
-            <h4>Construcción del MVP</h4>
-            <p>Primeras versiones de las apps Rider y Driver en Flutter con backend en Supabase.</p>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-date">Validación</div>
-            <h4>Prueba de campo</h4>
-            <p>APKs de producción con conductores seleccionados en CABA y AMBA para validar el sistema de seguridad.</p>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-date">Hoy</div>
-            <h4>Acceso anticipado</h4>
-            <p>Abrimos la lista de espera para los primeros pasajeros y conductores que quieran ser parte del cambio.</p>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-date">Próximo</div>
-            <h4>Lanzamiento en CABA</h4>
-            <p>Primeros viajes con el sistema completo. Validación biométrica, tarifas dinámicas y soporte en vivo.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ Lista de espera ════════════════════════════════════ -->
-<section id="lista-espera">
-  <div class="container">
-    <div class="waitlist-box fade-in">
-      <span class="section-label">Acceso anticipado</span>
-      <h2 class="section-title">Sé el primero en conocer Scertta</h2>
-      <p class="section-subtitle">
-        Estamos en fase de prueba. Sumate a la lista de espera y te avisamos cuando abramos el acceso en tu zona.
-      </p>
-      <form class="waitlist-form" id="waitlistForm" onsubmit="handleSubmit(event)">
-        <div class="form-row">
-          <div class="input-group" style="flex:1">
-            <input type="text" name="nombre" placeholder="Tu nombre" required autocomplete="given-name" />
-          </div>
-          <div class="input-group" style="flex:1">
-            <input type="tel" name="telefono" placeholder="Teléfono (WhatsApp)" required autocomplete="tel" />
-          </div>
-        </div>
-        <div class="input-group">
-          <input type="email" name="email" placeholder="Tu email" required autocomplete="email" />
-        </div>
-        <div class="input-group">
-          <select name="tipo" required>
-            <option value="" disabled selected>¿Cómo querés usar Scertta?</option>
-            <option value="pasajero">Soy pasajero — quiero viajar seguro</option>
-            <option value="conductor">Soy conductor — quiero trabajar con Scertta</option>
-            <option value="ambos">Ambos</option>
-          </select>
-        </div>
-        <button type="submit" class="btn-primary">
-          <span>Quiero mi lugar en la lista</span>
-          <span>→</span>
-        </button>
-        <p class="form-note">Sin spam. Sin compromisos. Te contactamos cuando abramos en tu zona.</p>
-      </form>
-      <div id="formSuccess" style="display:none;margin-top:24px;text-align:center;">
-        <div style="font-size:2.5rem;margin-bottom:12px;">✅</div>
-        <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:8px;">¡Ya estás en la lista!</h3>
-        <p style="color:var(--white-80);font-size:0.9rem;">Te vamos a avisar cuando abramos el acceso en tu zona. Gracias por ser parte de Scertta.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ Footer ══════════════════════════════════════════════ -->
-<footer>
-  <div class="container">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <a href="#" class="nav-logo" style="margin-bottom:12px;">
-          <svg width="120" height="26" viewBox="0 0 130 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="S-Route" role="img">
-            <circle cx="7" cy="14" r="4.5" fill="#00C896"/>
-            <path d="M11.5 14 C16 6,22 6,24 14 C26 22,32 22,36.5 14" stroke="#00C896" stroke-width="2" stroke-linecap="round" fill="none"/>
-            <circle cx="36.5" cy="14" r="3" fill="#00C896" fill-opacity="0.65"/>
-            <text x="46" y="19.5" font-family="Inter,system-ui,-apple-system,sans-serif" font-size="15" font-weight="800" letter-spacing="-0.4" fill="#FFFFFF">S-Route</text>
-          </svg>
-        </a>
-        <p>Transporte privado seguro en Ciudad Autónoma de Buenos Aires y AMBA. Conductores validados, tecnología argentina.</p>
-      </div>
-      <div class="footer-links">
-        <h4>Plataforma</h4>
-        <ul>
-          <li><a href="#como-funciona">Cómo funciona</a></li>
-          <li><a href="#seguridad">Seguridad</a></li>
-          <li><a href="#lista-espera">Acceso anticipado</a></li>
+    <div class="flows-grid">
+      <div class="flow-card flujo1">
+        <div class="flow-num">Flujo 1 · B2C</div>
+        <h3>Pasajero → Conductor</h3>
+        <p>Viajes particulares con seguridad biométrica, PIN de confirmación y botón de pánico integrado.</p>
+        <ul class="flow-spec">
+          <li>Comisión plataforma <span class="val">10%</span></li>
+          <li>Liquidación <span class="val">Semanal</span></li>
+          <li>Validación <span class="val">KYC + Selfie</span></li>
         </ul>
       </div>
-      <div class="footer-links">
+      <div class="flow-card flujo2">
+        <div class="flow-num">Flujo 2 · B2B</div>
+        <h3>Logística Empresarial</h3>
+        <p>Empresas con flota propia consumen API. Despacho automatizado y conciliación fiscal ARCA.</p>
+        <ul class="flow-spec">
+          <li>Comisión B2B <span class="val">4.5%</span></li>
+          <li>Liquidación API <span class="val">Semanal (7d)</span></li>
+          <li>Consumo <span class="val">b2b_consumo_api</span></li>
+        </ul>
+      </div>
+      <div class="flow-card flujo3">
+        <div class="flow-num">Flujo 3 · Franquicias</div>
+        <h3>Expansión Multi-Provincia</h3>
+        <p>Modelo de franquicias con gerentes autónomos, comisión Scertta y valores regulables por provincia.</p>
+        <ul class="flow-spec">
+          <li>Comisión Scertta <span class="val">7.9%</span></li>
+          <li>Control gerente <span class="val">Panel 12 tabs</span></li>
+          <li>Auditoría <span class="val">franquicia_config_auditoria</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Descargas -->
+<section id="descargas">
+  <div class="container">
+    <div class="section-title">
+      <h2>Descargas</h2>
+      <p>APKs de producción · Build 23-jun-2026 · Failover híbrido integrado</p>
+    </div>
+    <div class="downloads-grid">
+      <!-- Rutmy (pasajero) -->
+      <div class="download-card">
+        <div class="download-icon" style="background:rgba(212,160,23,0.12);">🧑</div>
+        <h3>Rutmy</h3>
+        <div class="subtitle">App para pasajeros</div>
+        <div class="meta">
+          <span>📦 com.rutmy.rider</span>
+          <span>📱 Android</span>
+        </div>
+        <a href="/apps/rutmy-pasajero-v1.0.apk" class="download-btn" download>
+          ⬇ Descargar APK
+        </a>
+      </div>
+      <!-- Rutmy Drive -->
+      <div class="download-card featured">
+        <div class="download-icon" style="background:rgba(212,160,23,0.12);">🚗</div>
+        <h3>Rutmy Drive</h3>
+        <div class="subtitle">App para conductores</div>
+        <div class="meta">
+          <span>📦 com.rutmy.driver</span>
+          <span>📱 Android</span>
+        </div>
+        <a href="/apps/rutmy-drive-v1.0.apk" class="download-btn" download>
+          ⬇ Descargar APK
+        </a>
+      </div>
+      <!-- Flota Rutmy -->
+      <div class="download-card">
+        <div class="download-icon" style="background:rgba(8,145,178,0.12);">🏢</div>
+        <h3>Flota Rutmy</h3>
+        <div class="subtitle">Portal para empresas</div>
+        <div class="meta">
+          <span>📦 com.rutmy.flota</span>
+          <span>📱 Android</span>
+        </div>
+        <a href="/apps/flota-rutmy-v1.0.apk" class="download-btn outline" download>
+          ⬇ Descargar APK
+        </a>
+      </div>
+    </div>
+    <p style="text-align:center; margin-top:32px; color:var(--white-40); font-size:0.82rem;">
+      ¿Problemas con la descarga?Contactá a <a href="mailto:soporte@scertta.com" style="color:var(--gold);">soporte@scertta.com</a>
+    </p>
+  </div>
+</section>
+
+<!-- Infraestructura -->
+<section id="infraestructura">
+  <div class="container">
+    <div class="section-title">
+      <h2>Infraestructura híbrida</h2>
+      <p>Failover automático local↔cloud con réplica PostgreSQL en tiempo real</p>
+    </div>
+    <div class="tech-grid">
+      <div class="tech-card">
+        <h4>🖥️ ZimaOS Server</h4>
+        <p>Servidor físico en Buenos Aires. 19GB RAM, PostgreSQL 17, Valhalla routing, Martin tiles.</p>
+      </div>
+      <div class="tech-card">
+        <h4>☁️ Supabase Cloud</h4>
+        <p>Base de datos en la nube con 176 políticas RLS. Réplica lógica pull desde ZimaOS.</p>
+      </div>
+      <div class="tech-card">
+        <h4>🔄 Failover <2s</h4>
+        <p>Si el servidor local cae, las apps cambian a Supabase Cloud automáticamente. Health check cada 15s.</p>
+      </div>
+      <div class="tech-card">
+        <h4>🗺️ Mapas self-hosted</h4>
+        <p>Valhalla routing engine + Martin vector tiles. Sin dependencia de APIs externas de mapas.</p>
+      </div>
+      <div class="tech-card">
+        <h4>🧠 Ollama + llava:13b</h4>
+        <p>Visión artificial para validación KYC de documentos. Modelo local, sin costo por inferencia.</p>
+      </div>
+      <div class="tech-card">
+        <h4>💰 ARCA integrado</h4>
+        <p>Facturación post-pago con riesgo fiscal argentino documentado. Conciliación en 3 pasos.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="footer-brand">Scertta</div>
+        <p>Plataforma empresarial de movilidad. Potenciando franquicias Rutmy en Argentina.</p>
+        <p style="margin-top:12px;">
+          <span class="build-info"><span class="status"></span> Build 23-jun-2026 · failover activo</span>
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4>Productos</h4>
+        <ul>
+          <li><a href="#descargas">Rutmy (pasajeros)</a></li>
+          <li><a href="#descargas">Rutmy Drive (conductores)</a></li>
+          <li><a href="#descargas">Flota Rutmy (empresas)</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
         <h4>Empresa</h4>
         <ul>
-          <li><a href="#nosotros">Nuestro camino</a></li>
-          <li><a href="mailto:contacto@scertta.com">Contacto</a></li>
-          <li><a href="mailto:conductores@scertta.com">Ser conductor</a></li>
+          <li><a href="#plataforma">Plataforma</a></li>
+          <li><a href="#flujos">Flujos de negocio</a></li>
+          <li><a href="mailto:contacto@rutmy.com">Contacto</a></li>
         </ul>
       </div>
-      <div class="footer-links">
+      <div class="footer-col">
         <h4>Legal</h4>
         <ul>
           <li><a href="#">Términos de uso</a></li>
           <li><a href="#">Privacidad</a></li>
-          <li><a href="#">Cookies</a></li>
+          <li><a href="mailto:soporte@scertta.com">Soporte</a></li>
         </ul>
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 Scertta · S-Route. Hecho con ❤️ en Buenos Aires, Argentina.</span>
-      <div class="footer-legal">
-        <a href="#">Términos</a>
-        <a href="#">Privacidad</a>
-        <a href="mailto:contacto@scertta.com">contacto@scertta.com</a>
-      </div>
+      <span>© 2026 Scertta — Infraestructura empresarial para Rutmy. Buenos Aires, Argentina.</span>
     </div>
   </div>
 </footer>
 
 <script>
-  // Tab switching
-  function switchTab(e, id) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    e.target.classList.add('active');
-    document.getElementById(id).classList.add('active');
-  }
-
-  // Waitlist form
-  function handleSubmit(e) {
-    e.preventDefault();
-    const form = e.target;
-    const data = Object.fromEntries(new FormData(form).entries());
-    // TODO: replace with real endpoint once backend is ready
-    console.log('Waitlist submission:', data);
-    form.style.display = 'none';
-    document.getElementById('formSuccess').style.display = 'block';
-  }
-
-  // Scroll fade-in
-  const observer = new IntersectionObserver(
-    entries => entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
-      }
-    }),
-    { threshold: 0.12 }
-  );
-  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-
-  // Smooth scroll for nav links
   document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener('click', e => {
       const id = a.getAttribute('href').slice(1);
       const target = document.getElementById(id);
-      if (target) {
-        e.preventDefault();
-        target.scrollIntoView({ behavior: 'smooth' });
-      }
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
     });
   });
 </script>

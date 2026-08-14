@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-06-23T15:05:08.112871",
+  "duration_s": 19.1876699924469,
+  "total_offers": 50,
+  "total_trips": 200,
+  "total_valhalla": 200,
+  "errors": 6,
+  "offer_latency_p50_ms": 444.5102159806993,
+  "offer_latency_p95_ms": 522.8687369963154,
+  "trip_latency_p50_ms": 301.0799949988723,
+  "trip_latency_p95_ms": 396.0604039893951,
+  "valhalla_latency_p50_ms": 95.58464199653827,
+  "valhalla_latency_p95_ms": 163.48705199197866,
+  "ram_peak_gb": 2.9656600952148438,
+  "ram_avg_gb": 2.947306823730469,
+  "cpu_peak_pct": 39.0,
+  "cpu_avg_pct": 8.120000000000001
+}
